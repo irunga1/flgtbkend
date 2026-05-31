@@ -1,0 +1,24 @@
+{
+  "name": "freelancegt",
+  "version": "1.0.0",
+  "description": "sitio para desarrolladores y freelancers en guatemala",
+  "keywords": [
+    "freelance",
+    "freelancegt",
+    "gt",
+    "guatemala"
+  ],
+  "license": "ISC",
+  "author": "@irungauno",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js",
+    "start": "node server.js" 
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "nodemon": "^3.1.14"
+  }
+}
