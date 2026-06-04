@@ -1,64 +1,114 @@
 const Utilery = require("../libs/utilery");
 const router  = require('express').Router();
+const db = require("../db"); // importa tu conexión knex
 
-// Obtener roles (ejemplo con query)
-router.get("/roles", (req, res) => {
+
+// Obtener roles
+router.get("/", async (req, res) => {
     try {
-        console.log(req.query);
         let ut = new Utilery();
-        let {id, nombre} = req.query;
+        let { id, nombre } = req.query;
 
         id = ut.sanitizeText(id);
         nombre = ut.sanitizeText(nombre);
 
-        res.json({id, nombre});
+        let query = db("roles").select("*");
+        if (id) query = query.where({ id_rol: id });
+        if (nombre) query = query.where("nombre", "like", `%${nombre}%`);
+
+        let roles = await query;
+        res.json(roles);
     } catch (error) {
-        res.json({error});
+        res.status(500).json({ error: error.message });
+    }
+});
+router.get("/search", async (req, res) => {
+    try {
+        let ut = new Utilery();
+        let { id, nombre } = req.query;
+
+        id = ut.sanitizeText(id);
+        nombre = ut.sanitizeText(nombre);
+
+        let query = db("roles").select("*");
+        if (id) query = query.where({ id_rol: id });
+        if (nombre) query = query.where("nombre", "like", `%${nombre}%`);
+
+        const results = await query;
+        res.json(results);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 });
 
-// Crear rol
-router.post("/roles", (req, res) => {
+
+router.get("/:id", async (req,res) => {
     try {
         let ut = new Utilery();
-        let {nombre} = req.body;
+        let {id} = req.params;
+        let query = db("roles").select("*");
+        if (id){
+            query = query.where({ id_rol: id });
+        }
+        let rol = await query;
+        res.json({rol});
+    } catch (error) {
+        console.log(error);
+        res.json({error});
+    }
+})
+
+
+
+// Crear rol
+router.post("/", async (req, res) => {
+    try {
+        let ut = new Utilery();
+        let { nombre } = req.body;
 
         nombre = ut.sanitizeText(nombre);
 
-        res.json({nombre});
+        let [id] = await db("roles").insert({ nombre });
+        res.json({ id_rol: id, nombre });
     } catch (error) {
-        res.json({error});
+        res.status(500).json({ error: error.message });
     }
 });
 
 // Actualizar rol
-router.put("/roles/:id", (req, res) => {
+router.put("/:id", async (req, res) => {
     try {
         let ut = new Utilery();
-        let {nombre} = req.body;
-        let {id} = req.params;
+        let { id } = req.params;
+        let { nombre } = req.body;
 
         id = ut.sanitizeText(id);
         nombre = ut.sanitizeText(nombre);
 
-        res.json({id, nombre});
+        await db("roles")
+            .where({ id_rol: id })
+            .update({ nombre });
+
+        res.json({ id_rol: id, nombre });
     } catch (error) {
-        res.json({error});
+        res.status(500).json({ error: error.message });
     }
 });
 
 // Eliminar rol
-router.delete("/roles/:id", (req, res) => {
+router.delete("/:id", async (req, res) => {
     try {
         let ut = new Utilery();
-        let {id} = req.params;
+        let { id } = req.params;
 
         id = ut.sanitizeText(id);
 
-        res.json({id, deleted: true});
+        await db("roles").where({ id_rol: id }).del();
+        res.json({ id_rol: id, deleted: true });
     } catch (error) {
-        res.json({error});
+        res.status(500).json({ error: error.message });
     }
 });
 
 module.exports = router;
+

@@ -1,64 +1,99 @@
 const Utilery = require("../libs/utilery");
 const router  = require('express').Router();
+const db = require("../db"); // importa tu conexión knex
+
 
 // Obtener skills
-router.get("/skills", (req, res) => {
+router.get("/", async (req, res) => {
     try {
-        console.log(req.query);
         let ut = new Utilery();
-        let {id, nombre} = req.query;
+        let { id, nombre } = req.query;
 
         id = ut.sanitizeText(id);
         nombre = ut.sanitizeText(nombre);
 
-        res.json({id, nombre});
+        let query = db("skills").select("*");
+        if (id) query = query.where({ id_skill: id });
+        if (nombre) query = query.where("nombre", "like", `%${nombre}%`);
+
+        let skills = await query;
+        res.json(skills);
     } catch (error) {
-        res.json({error});
+        res.status(500).json({ error: error.message });
     }
 });
 
-// Crear skill
-router.post("/skills", (req, res) => {
+// Buscar skills
+router.get("/search", async (req, res) => {
     try {
         let ut = new Utilery();
-        let {nombre} = req.body;
+        let { id, nombre } = req.query;
+
+        id = ut.sanitizeText(id);
+        nombre = ut.sanitizeText(nombre);
+
+        let query = db("skills").select("*");
+        if (id) query = query.where({ id_skill: id });
+        if (nombre) query = query.where("nombre", "like", `%${nombre}%`);
+
+        const results = await query;
+        res.json(results);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+// Crear skill
+router.post("/", async (req, res) => {
+    try {
+        let ut = new Utilery();
+        let { nombre } = req.body;
 
         nombre = ut.sanitizeText(nombre);
 
-        res.json({nombre});
+        let [id] = await db("skills").insert({ nombre });
+        res.json({ id_skill: id, nombre });
     } catch (error) {
-        res.json({error});
+        res.status(500).json({ error: error.message });
     }
 });
 
 // Actualizar skill
-router.put("/skills/:id", (req, res) => {
+router.put("/:id", async (req, res) => {
     try {
         let ut = new Utilery();
-        let {id} = req.params;
-        let {nombre} = req.body;
+        let { id } = req.params;
+        let { nombre } = req.body;
 
         id = ut.sanitizeText(id);
         nombre = ut.sanitizeText(nombre);
 
-        res.json({id, nombre});
+        await db("skills")
+            .where({ id_skill: id })
+            .update({ nombre });
+
+        res.json({ id_skill: id, nombre });
     } catch (error) {
-        res.json({error});
+        res.status(500).json({ error: error.message });
     }
 });
 
 // Eliminar skill
-router.delete("/skills/:id", (req, res) => {
+router.delete("/:id", async (req, res) => {
     try {
         let ut = new Utilery();
-        let {id} = req.params;
+        let { id } = req.params;
 
         id = ut.sanitizeText(id);
 
-        res.json({id, deleted: true});
+        await db("skills").where({ id_skill: id }).del();
+        res.json({ id_skill: id, deleted: true });
     } catch (error) {
-        res.json({error});
+        res.status(500).json({ error: error.message });
     }
 });
 
 module.exports = router;
+
+

@@ -1,6 +1,6 @@
 const Utilery = require("../libs/utilery");
 const router  = require('express').Router();
-router.get("/user",(req,res) => {
+router.get("/",(req,res) => {
     try {
         console.log(req.query);
         let ut = new Utilery();
