@@ -1,4 +1,5 @@
 const Utilery = require("../libs/utilery");
+const Cripter = require("../libs/cripter");
 const router = require("express").Router();
 const db = require("../db");
 
@@ -66,14 +67,16 @@ router.get("/:id", async (req, res) => {
 // Crear usuario
 router.post("/", async (req, res) => {
     try {
+
+         console.log("Body recibido:", req.body);
         const ut = new Utilery();
-        let { name, email, password, id_rol } = req.body;
+        let { name, email, password, id_rol } = req.body;    
 
         name = ut.sanitizeText(name);
         email = ut.sanitizeEmail(email);
         password = ut.sanitizePassword(password);
-        id_rol = ut.sanitizeText(id_rol);
-
+        password = new Cripter().encript(password);
+        id_rol = parseInt(id_rol);
         const [id] = await db("usuarios").insert({
             nombre: name,
             email,
