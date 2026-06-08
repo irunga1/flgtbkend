@@ -1,7 +1,8 @@
 const express = require('express');
+// const cors = require('cors');
 // local libs
 const Utilery = require("./libs/utilery");
-// const cors = require("cors");
+const cors = require("cors");
 // routes
 const user = require("./routes/user");
 const roles = require("./routes/roles");
@@ -13,7 +14,8 @@ const login = require("./routes/login");
 
 // server routes
 const app = express();
-// app.use(cors());
+app.use(cors());
+
 app.use(express.json()); // <-- Esto es clave
 app.use(express.urlencoded({ extended: true }));
 
