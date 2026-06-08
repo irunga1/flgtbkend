@@ -1,10 +1,11 @@
 const Utilery = require("../libs/utilery");
 const router  = require('express').Router();
 const db = require("../db"); // importa tu conexión knex
+const { authJwt } = require("../middlewares/authJwt");
 
 
 // Obtener proyectos
-router.get("/", async (req, res) => {
+router.get("/", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
         let { id, titulo, id_cliente, estado } = req.query;
@@ -28,7 +29,7 @@ router.get("/", async (req, res) => {
 });
 
 // Buscar proyectos
-router.get("/search", async (req, res) => {
+router.get("/search", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
         let { id, titulo, id_cliente, estado } = req.query;
@@ -53,7 +54,7 @@ router.get("/search", async (req, res) => {
 
 
 // Crear proyecto
-router.post("/", async (req, res) => {
+router.post("/", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
         let { titulo, descripcion, presupuesto, id_cliente, estado } = req.body;
@@ -79,7 +80,7 @@ router.post("/", async (req, res) => {
 });
 
 // Actualizar proyecto
-router.put("/:id", async (req, res) => {
+router.put("/:id", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
         let { id } = req.params;
@@ -110,7 +111,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // Eliminar proyecto
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
         let { id } = req.params;

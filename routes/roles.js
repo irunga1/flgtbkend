@@ -1,10 +1,11 @@
 const Utilery = require("../libs/utilery");
 const router  = require('express').Router();
 const db = require("../db"); // importa tu conexión knex
+const { authJwt } = require("../middlewares/authJwt");
 
 
 // Obtener roles
-router.get("/", async (req, res) => {
+router.get("/", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
         let { id, nombre } = req.query;
@@ -22,7 +23,7 @@ router.get("/", async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-router.get("/search", async (req, res) => {
+router.get("/search", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
         let { id, nombre } = req.query;
@@ -42,7 +43,7 @@ router.get("/search", async (req, res) => {
 });
 
 
-router.get("/:id", async (req,res) => {
+router.get("/:id", authJwt, async (req,res) => {
     try {
         let ut = new Utilery();
         let {id} = req.params;
@@ -61,7 +62,7 @@ router.get("/:id", async (req,res) => {
 
 
 // Crear rol
-router.post("/", async (req, res) => {
+router.post("/", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
         let { nombre } = req.body;
@@ -76,7 +77,7 @@ router.post("/", async (req, res) => {
 });
 
 // Actualizar rol
-router.put("/:id", async (req, res) => {
+router.put("/:id", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
         let { id } = req.params;
@@ -96,7 +97,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // Eliminar rol
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
         let { id } = req.params;

@@ -1,10 +1,11 @@
 const Utilery = require("../libs/utilery");
 const router  = require('express').Router();
 const db = require("../db"); // importa tu conexión knex
+const { authJwt } = require("../middlewares/authJwt");
 
 
 // Obtener freelancer_proyectos
-router.get("/", async (req, res) => {
+router.get("/", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
         let { id, id_proyecto, id_freelancer, estado } = req.query;
