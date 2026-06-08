@@ -1,17 +1,18 @@
 const Utilery = require("../libs/utilery");
 const router  = require('express').Router();
 const db = require("../db"); // importa tu conexión knex
+const { authJwt } = require("../middlewares/authJwt");
+
 
 
 // Obtener skills
-router.get("/", async (req, res) => {
+router.get("/", authJwt, async (req, res) => {
+
     try {
         let ut = new Utilery();
         let { id, nombre } = req.query;
-
         id = ut.sanitizeText(id);
         nombre = ut.sanitizeText(nombre);
-
         let query = db("skills").select("*");
         if (id) query = query.where({ id_skill: id });
         if (nombre) query = query.where("nombre", "like", `%${nombre}%`);
@@ -24,7 +25,8 @@ router.get("/", async (req, res) => {
 });
 
 // Buscar skills
-router.get("/search", async (req, res) => {
+router.get("/search", authJwt, async (req, res) => {
+
     try {
         let ut = new Utilery();
         let { id, nombre } = req.query;
@@ -45,7 +47,8 @@ router.get("/search", async (req, res) => {
 
 
 // Crear skill
-router.post("/", async (req, res) => {
+router.post("/", authJwt, async (req, res) => {
+
     try {
         let ut = new Utilery();
         let { nombre } = req.body;
@@ -60,7 +63,8 @@ router.post("/", async (req, res) => {
 });
 
 // Actualizar skill
-router.put("/:id", async (req, res) => {
+router.put("/:id", authJwt, async (req, res) => {
+
     try {
         let ut = new Utilery();
         let { id } = req.params;
@@ -80,7 +84,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // Eliminar skill
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
         let { id } = req.params;

@@ -1,16 +1,19 @@
 const express = require('express');
+// local libs
 const Utilery = require("./libs/utilery");
+// const cors = require("cors");
+// routes
 const user = require("./routes/user");
-const user2 = require("./routes/user--");
-
 const roles = require("./routes/roles");
 const skills = require("./routes/skills");
 const proyectos = require("./routes/proyectos");
 const freelancer_proyectos = require("./routes/freelancer_proyectos");
 const usuario_skills = require("./routes/usuario_skills");
 const login = require("./routes/login");
-const app = express();
 
+// server routes
+const app = express();
+// app.use(cors());
 app.use(express.json()); // <-- Esto es clave
 app.use(express.urlencoded({ extended: true }));
 

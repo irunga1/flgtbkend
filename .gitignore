@@ -1,0 +1,4 @@
+.env
+/freelancegt/data/freelancegt.db
+/freelancegt/data/freelance.db
+/node_modules/
