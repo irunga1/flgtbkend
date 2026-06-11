@@ -47,42 +47,32 @@ router.get("/",async (req, res) => {
 router.put("/", async (req, res) => {
     try {
         const ut = new Utilery("");
-        const { id_usuario, email, nombre, password, skillsToDelete } = req.body;
+        const { id_usuario, email, nombre, password, skillsToDelete, skillsToAdd } = req.body;
 
         let id = ut.sanitizeText(id_usuario);
         id = Number(id);
         if (!id || Number.isNaN(id)) {
             return res.status(400).json({ error: 'id_usuario requerido (número)' });
         }
-
-        // Actualizar datos del usuario en tabla `usuarios`
         const hasUsuariosTable = await db.schema.hasTable('usuarios');
         if (!hasUsuariosTable) {
             return res.status(500).json({ error: 'No existe tabla `usuarios` en la base de datos' });
         }
-
         const updateUser = {};
         if (email !== undefined) updateUser.email = ut.sanitizeText(email);
         if (nombre !== undefined) updateUser.nombre = ut.sanitizeText(nombre);
-
         if (password !== undefined) {
             const Cripter = require("../libs/cripter");
             const cripter = new Cripter("");
             updateUser.password = cripter.encript(ut.sanitizeText(password));
         }
-
-        // Si viene al menos un campo, hacemos update
         if (Object.keys(updateUser).length > 0) {
             await db('usuarios').where({ id_usuario: id }).update(updateUser);
         }
-
-        // Borrar skills del usuario (NO actualizar)
-        // El formato enviado es skillsToDelete: [id_usuario_skill]
         if (skillsToDelete !== undefined) {
             if (!Array.isArray(skillsToDelete)) {
                 return res.status(400).json({ error: 'skillsToDelete debe ser un array de id_usuario_skill' });
             }
-
             const ids = skillsToDelete
                 .map((x) => Number(ut.sanitizeText(x)))
                 .filter((x) => x && !Number.isNaN(x));
@@ -94,15 +84,25 @@ router.put("/", async (req, res) => {
                     .del();
             }
         }
-
+        if (skillsToAdd !== undefined) {
+            if (!Array.isArray(skillsToAdd)) {
+                return res.status(400).json({ error: 'skillsToAdd debe ser un array de objetos {id_skill, nivel}' });
+            }
+            const newSkills = skillsToAdd.map(skill => ({
+                id_usuario: id,
+                id_skill: Number(ut.sanitizeText(skill.id_skill)),
+                nivel: ut.sanitizeText(skill.nivel)
+            })).filter(s => s.id_skill && !Number.isNaN(s.id_skill));
+            if (newSkills.length > 0) {
+                await db('usuario_skills').insert(newSkills);
+            }
+        }
         // Responder con estado actualizado
         const user = await db('usuarios').select('*').where({ id_usuario: id }).limit(1);
-
         const skills = await db('usuario_skills')
             .join('skills', 'usuario_skills.id_skill', 'skills.id_skill')
             .select('skills.id_skill', 'skills.nombre', 'usuario_skills.nivel')
             .where({ 'usuario_skills.id_usuario': id });
-
         res.json({
             id_usuario: id,
             user: user?.[0] || null,
@@ -112,5 +112,6 @@ router.put("/", async (req, res) => {
         res.status(500).json({ error: error.message || String(error) });
     }
 });
-module.exports = router
+
+module.exports = router;
 
