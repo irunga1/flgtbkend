@@ -28,10 +28,10 @@ router.get("/",async (req, res) => {
             .join('skills', 'usuario_skills.id_skill', 'skills.id_skill')
             .select(
                 'skills.id_skill',
-                'skills.nombre',
-                'usuario_skills.nivel'
+                'skills.nombre'
             )
             .where({ 'usuario_skills.id_usuario': id_usuario });
+
 
         res.json({
             id_usuario,
@@ -86,23 +86,24 @@ router.put("/", async (req, res) => {
         }
         if (skillsToAdd !== undefined) {
             if (!Array.isArray(skillsToAdd)) {
-                return res.status(400).json({ error: 'skillsToAdd debe ser un array de objetos {id_skill, nivel}' });
+                return res.status(400).json({ error: 'skillsToAdd debe ser un array de objetos {id_skill}' });
             }
             const newSkills = skillsToAdd.map(skill => ({
                 id_usuario: id,
-                id_skill: Number(ut.sanitizeText(skill.id_skill)),
-                nivel: ut.sanitizeText(skill.nivel)
+                id_skill: Number(ut.sanitizeText(skill.id_skill))
             })).filter(s => s.id_skill && !Number.isNaN(s.id_skill));
             if (newSkills.length > 0) {
                 await db('usuario_skills').insert(newSkills);
             }
+
         }
         // Responder con estado actualizado
         const user = await db('usuarios').select('*').where({ id_usuario: id }).limit(1);
         const skills = await db('usuario_skills')
             .join('skills', 'usuario_skills.id_skill', 'skills.id_skill')
-            .select('skills.id_skill', 'skills.nombre', 'usuario_skills.nivel')
+            .select('skills.id_skill', 'skills.nombre')
             .where({ 'usuario_skills.id_usuario': id });
+
         res.json({
             id_usuario: id,
             user: user?.[0] || null,
