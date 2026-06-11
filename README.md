@@ -84,14 +84,15 @@ Rutas protegidas con `authJwt`:
 ### Perfil del usuario
 - `GET /perfil?id_usuario=<id>`
   - Obtiene:
-    - datos del usuario desde `users` si existe la tabla
-    - skills del usuario haciendo JOIN entre `usuario_skills` y `skills`
+    - `user`: datos del usuario desde `users` si existe la tabla (si no existe, regresa `null`)
+    - `skills`: lista de skills del usuario haciendo `JOIN` entre `usuario_skills` y `skills`
+    - **Importante:** en el perfil, ya no se maneja columna `nivel`.
 
 - `PUT /perfil`
   - Actualiza datos del usuario en `usuarios` (email/nombre/password)
   - Gestiona skills del usuario:
-    - elimina (`skillsToDelete`) desde `usuario_skills`
-    - inserta (`skillsToAdd`) en `usuario_skills`
+    - elimina (`skillsToDelete`) desde `usuario_skills` por `id_usuario_skill`
+    - inserta (`skillsToAdd`) en `usuario_skills` usando objetos `{ id_skill }`
 
 ---
 
@@ -103,13 +104,14 @@ A continuación se describe **cómo viaja la información** en el sistema para c
 - `usuarios` (usuarios del sistema)
 - `roles`
 - `skills`
-- `usuario_skills` (relación usuario ↔ skill con `nivel`) 
+- `usuario_skills` (relación usuario ↔ skill)
 - `proyectos` (proyectos creados por cliente)
 - `freelancer_proyecto` (relación freelancer ↔ proyecto con `propuesta` y `estado`)
 
 ---
 
 ## 1) Flujo del Cliente
+
 
 ### A. Registro/alta de usuario (si aplica)
 1. (Opcional) Crear usuario en `POST /users`
