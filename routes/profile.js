@@ -59,7 +59,7 @@ router.put("/", async (req, res) => {
             return res.status(500).json({ error: 'No existe tabla `usuarios` en la base de datos' });
         }
         const updateUser = {};
-        if (email !== undefined) updateUser.email = ut.sanitizeText(email);
+        if (email !== undefined) updateUser.email = ut.sanitizeEmail(email);
         if (nombre !== undefined) updateUser.nombre = ut.sanitizeText(nombre);
         if (password !== undefined) {
             const Cripter = require("../libs/cripter");

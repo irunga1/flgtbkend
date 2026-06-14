@@ -52,10 +52,45 @@ router.post("/forgot", async (req, res) => {
             .where({ email })
             .first();
         if (user) {
-            // Aquí iría la lógica para enviar un correo de recuperación
+            let dt= new Date();
+            let nPassword = cripter.encript(`newpass___${dt}`).substring(0, 7); // Generar una contraseña temporal
+            // Aquí iría la lógica para enviar un correo de recuperación con nPassword
+            nPassword = ut.sanitizePassword(nPassword);
+            const encrypted = cripter.encript(nPassword);
+            await db("usuarios")    
+                .where({ email })
+                .update({ password: encrypted });
             return res.json({
                 status: "ok",
                 desc: "recovery email sent"
+            });
+        } else {
+            return res.json({
+                status: "error",
+                desc: "email not found"
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.post("/reset", async (req, res) => {
+    try {
+        const ut = new Utilery();
+        const cripter = new Cripter();
+        let { email, newPassword } = req.body;
+        email = ut.sanitizeEmail(email);
+        newPassword = ut.sanitizePassword(newPassword);
+        const encrypted = cripter.encript(newPassword);
+        const updated = await db("usuarios")
+            .where({ email })
+            .update({ password: encrypted });
+        if (updated) {
+            return res.json({
+                status: "ok",
+                desc: "password reset successful"
             });
         } else {
             return res.json({

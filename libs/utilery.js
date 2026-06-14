@@ -5,7 +5,9 @@ class Utilery {
 
     sanitizeText = (strWords = "") => {
         try {
-            const notAllow = ["'", '"', " ", "-", "_", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "+", "=", "{", "}", "[", "]", "|", "\\", "/", "<", ">", "?", "~", "`"];
+            strWords = String(strWords);
+            const notAllow = ["'", '"',  "-", "_", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "+", "=", "{", "}", "[", "]", "|", "\\", "/", "<", ">", "?", "~", "`"];
+            
             if (strWords !== "") {
                 for (let it of notAllow) {
                     strWords = strWords.replaceAll(it, "");

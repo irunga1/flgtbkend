@@ -68,26 +68,33 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
     try {
 
-         console.log("Body recibido:", req.body);
+        console.log("Body recibido:", req.body);
         const ut = new Utilery();
-        let { name, email, password, id_rol } = req.body;    
-
-        name = ut.sanitizeText(name);
+        let { nombre, email, password, id_rol } = req.body; 
+        nombre = ut.sanitizeText(nombre);
         email = ut.sanitizeEmail(email);
         password = ut.sanitizePassword(password);
         password = new Cripter().encript(password);
         id_rol = parseInt(id_rol);
         const [id] = await db("usuarios").insert({
-            nombre: name,
+            nombre: nombre,
             email,
             password,
             id_rol
         });
-
-        res.json({ id, name, email, id_rol });
+        if(id > 0){
+            let status = "ok";
+            let desc = "user created successfully";
+            res.json({ status, desc, id, nombre, email, id_rol });  
+        }
+        else{
+            let status = "error";
+            let desc = "failed to create user";
+            res.json({ status, desc });  
+        }
 
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({status:"error", desc: error.message });
     }
 });
 
@@ -97,9 +104,11 @@ router.put("/:id", async (req, res) => {
         const ut = new Utilery();
         const { id } = req.params;
         let { name, email, password, id_rol } = req.body;
-
+        console.log(req.body);
+        console.log(email);
         name = ut.sanitizeText(name);
         email = ut.sanitizeEmail(email);
+        console.log(email);
         password = ut.sanitizePassword(password);
         id_rol = ut.sanitizeText(id_rol);
 
