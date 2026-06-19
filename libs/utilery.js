@@ -19,6 +19,27 @@ class Utilery {
             return false;
         }
     }
+    sanitizeParagraph = (text) => {
+        try {
+
+        if (text === "") return "";
+        text = String(text).trim();
+        const notAllow = ["'", "\"", "`", "\\", "|", "{", "}", "[", "]", "<", ">", ";", "--"];
+        for (let it of notAllow) {
+            text = text.replaceAll(it, "");
+        }
+        // Opcional: normalizar espacios múltiples
+        text = text.replace(/\s+/g, " ");
+        // Opcional: limitar tamaño para evitar payloads enormes
+        if (text.length > 450) return false;
+        return text;
+
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+    
 
     sanitizeEmail = (email = "") => {
         try {
@@ -45,15 +66,11 @@ class Utilery {
             if (password === "") return "";
 
             password = String(password);
-
-            // Remove control characters and common injection-breaking characters.
-            // We avoid removing too many chars to not destroy passwords.
             const notAllow = ["\n", "\r", "\t", "\0", "\\0", "\x08", "\x0b", "\x0c", "<", ">", "'", '"', "\\"]; 
             for (let it of notAllow) {
                 password = password.split(it).join("");
             }
-
-            // Optional: enforce reasonable max length (server-side)
+            
             if (password.length > 256) return false;
 
             return password;

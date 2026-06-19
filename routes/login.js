@@ -20,7 +20,12 @@ router.post("/", async (req, res) => {
             .first();
         if (user) {
             let dt= new Date();
-            const token = jwt.sign({email},SECRET_KEY,{expiresIn:"1h"});
+            // const token = jwt.sign({email},SECRET_KEY,{expiresIn:"1h"});
+            const token = jwt.sign(
+                { id_usuario: user.id_usuario, email: user.email, id_rol: user.id_rol },
+                SECRET_KEY,
+                { expiresIn: "1h" }
+            );
             return res.json({
                 status: "ok",
                 desc: "logged",

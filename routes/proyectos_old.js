@@ -3,28 +3,26 @@ const router  = require('express').Router();
 const db = require("../db"); // importa tu conexión knex
 const { authJwt } = require("../middlewares/authJwt");
 
+// function getPermissions(req) {
+//     const id_usuario = req?.user?.id_usuario;
+//     const id_rol = req?.user?.id_rol;
+//     return { id_usuario, id_rol };
+// }
+
 
 // Obtener proyectos
-// router.get("/", authJwt, async (req, res) => {
-// router.get("/a",authJwt, (req,res) => {
-//     try {
-//         res.json({status:"ok",desc:"itworks"});
-//     } catch (error) {
-//         res.json({error})
-//     }
-// });
 router.get("/", authJwt, async (req, res) => {
     try {
+        console.log(req.user);
         let ut = new Utilery();
         let { id, titulo, id_cliente, estado } = req.query;
         let dias = 30;
-        console.log(req.user);
-        
+
         id = ut.sanitizeText(id);
         titulo = ut.sanitizeText(titulo);
         id_cliente = ut.sanitizeText(id_cliente);
         estado = ut.sanitizeText(estado);
-        
+
         let query = db("proyectos")
         .select(
             "proyectos.id_proyecto",
@@ -48,19 +46,12 @@ router.get("/", authJwt, async (req, res) => {
         .leftJoin("skills as s3", "proyectos.skill3", "s3.id_skill")
         .leftJoin("skills as s4", "proyectos.skill4", "s4.id_skill")
         .leftJoin("skills as s5", "proyectos.skill5", "s5.id_skill")
-        // .where("usuarios.id_rol", 3); // filtro por rol
+        .where("usuarios.id_rol", 3); // filtro por rol
 
         if (id) query = query.where({ "proyectos.id_proyecto": id });
         if (titulo) query = query.where("proyectos.titulo", "like", `%${titulo}%`);
         if (id_cliente) query = query.where({ "proyectos.id_cliente": id_cliente });
         if (estado) query = query.where({ "proyectos.estado": estado });
-        if(req.user.id_rol ==3 ){
-            query.where({"usuarios.id_usuario":req.user.id_usuario})
-        }
-        else {
-            // si no, aplicar el filtro general por rol
-            query = query.where("usuarios.id_rol", 3);
-        }
 
         // filtro de rango de fecha (últimos 30 días)
         if (dias) {
@@ -77,7 +68,7 @@ router.get("/", authJwt, async (req, res) => {
     }
 });
 
-router.get("/latest20", async (req, res) => {
+router.get("/latest20", authJwt, async (req, res) => {
     try {
         const limit = 20;
         const proyectos = await db("proyectos")
@@ -121,12 +112,10 @@ router.get("/search", async (req, res) => {
     try {
         let ut = new Utilery();
         let { id, titulo, id_cliente, estado } = req.query;
-
         id = ut.sanitizeText(id);
         titulo = ut.sanitizeText(titulo);
         id_cliente = ut.sanitizeText(id_cliente);
         estado = ut.sanitizeText(estado);
-
         let query = db("proyectos")
         .select(
             "proyectos.id_proyecto",
