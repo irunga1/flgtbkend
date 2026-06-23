@@ -60,8 +60,8 @@ router.get("/myprojectscl",async(req,res) => {
             JOIN skills s3 ON p.skill3 = s3.id_skill
             JOIN skills s4 ON p.skill4 = s4.id_skill
             JOIN skills s5 ON p.skill5 = s5.id_skill
-            WHERE p.id_cliente = ${idclient}`
-        // res.json({idclient});
+            WHERE p.id_cliente = ${idclient}`;
+        
         const rows = await db.raw(strQuery);
         res.json({ status: "success", data: rows });
 
@@ -104,9 +104,7 @@ router.get("/myprojectscl",async(req,res) => {
             WHERE p.id_cliente = ${idclient}` // Asegúrate de que el rol del freelancer sea 2
         // res.json({idclient});
         const rows = await db.raw(strQuery);
-        res.json({ status: "success", data: rows });
-
-        
+        res.json({ status: "success", data: rows });        
     } catch (error) {
         console.log(error)
         res.json(error)

@@ -1,7 +1,10 @@
 # TODO
 
-- [ ] Implementar `GET /perfil` en `routes/profile.js` para obtener:
-  - datos del usuario por `id_usuario` (query param)
-  - skills del usuario uniendo `usuario_skills` con `skills`
-- [ ] Probar endpoint: `GET /perfil?id_usuario=<id>`
+- [x] Eliminar README.md actual
+- [x] Crear nuevo README.md con:
+  - lista de endpoints reales
+  - qué hace cada endpoint
+  - cómo debe funcionar (flujo general)
+  - indicar uso de authJwt (token Bearer) donde aplique
+
 
