@@ -4,50 +4,52 @@ const { authJwt } = require("../middlewares/authJwt");
 const db = require("../db");
 
 // router.get("/",authJwt ,async (req, res) => {
-router.get("/",async (req, res) => {
-    try {
-        const ut = new Utilery("");
-        let { id_usuario } = req.query;
-        id_usuario = ut.sanitizeText(id_usuario);
-        id_usuario = Number(id_usuario);
-        if (!id_usuario || Number.isNaN(id_usuario)) {
-            return res.status(400).json({ error: 'id_usuario requerido (número)' });
-        }
-        // Datos del usuario (si existe tabla `users` usa esa; si no, evitamos romper)
-        let user = null;
-        const hasUsersTable = await db.schema.hasTable('users');
-        if (hasUsersTable) {
-            const usersRows = await db('users')
-                .select('*')
-                .where({ id_usuario })
-                .limit(1);
-            user = usersRows?.[0] || null;
-        }
-        // Skills del usuario
-        const skills = await db('usuario_skills')
-            .join('skills', 'usuario_skills.id_skill', 'skills.id_skill')
-            .select(
-                'skills.id_skill',
-                'skills.nombre'
-            )
-            .where({ 'usuario_skills.id_usuario': id_usuario });
+router.get("/", async (req, res) => {
+  try {
+    const ut = new Utilery("");
+    let { id_usuario } = req.query;
 
+    id_usuario = ut.sanitizeText(id_usuario);
+    id_usuario = Number(id_usuario);
 
-        res.json({
-            id_usuario,
-            user,
-            skills
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message || String(error) });
+    if (!id_usuario || Number.isNaN(id_usuario)) {
+      return res.status(400).json({ error: "id_usuario requerido (número)" });
     }
+
+    // Datos del usuario
+    let user = null;
+    const hasUsuariosTable = await db.schema.hasTable("usuarios");
+    if (hasUsuariosTable) {
+      const usuariosRows = await db("usuarios")
+        .select("*")
+        .where({ id_usuario })
+        .limit(1);
+
+      user = usuariosRows?.[0] || null;
+    }
+
+    // Skills del usuario
+    const skills = await db("usuario_skills")
+      .join("skills", "usuario_skills.id_skill", "skills.id_skill")
+      .select("skills.id_skill", "skills.nombre")
+      .where({ "usuario_skills.id_usuario": id_usuario });
+
+    res.json({
+      id_usuario,
+      user,
+      skills,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message || String(error) });
+  }
 });
+
 
 // router.put("/", authJwt, async (req, res) => {
 router.put("/", async (req, res) => {
     try {
         const ut = new Utilery("");
-        const { id_usuario, email, nombre, password, skillsToDelete, skillsToAdd } = req.body;
+        const { id_usuario, email, nombre, password, skillsToDelete, skillsToAdd,descripcion } = req.body;
 
         let id = ut.sanitizeText(id_usuario);
         id = Number(id);
@@ -65,6 +67,7 @@ router.put("/", async (req, res) => {
             const Cripter = require("../libs/cripter");
             const cripter = new Cripter("");
             updateUser.password = cripter.encript(ut.sanitizeText(password));
+            updateUser.descripcion = ut.sanitizeParagraph(descripcion)
         }
         if (Object.keys(updateUser).length > 0) {
             await db('usuarios').where({ id_usuario: id }).update(updateUser);

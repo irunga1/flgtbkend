@@ -29,7 +29,7 @@ router.post("/", async (req, res) => {
             return res.json({
                 status: "ok",
                 desc: "logged",
-                user: { id: user.id_usuario, nombre: user.nombre, email: user.email },
+                user: { id: user.id_usuario, nombre: user.nombre, email: user.email, id_rol:user.id_rol },
                 ref : cripter.encript(`freelancegt___${dt}`),
                 token// Aquí iría un token JWT real en una implementación completa
 

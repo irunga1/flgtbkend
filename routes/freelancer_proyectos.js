@@ -2,6 +2,8 @@ const Utilery = require("../libs/utilery");
 const router  = require('express').Router();
 const db = require("../db"); // importa tu conexión knex
 const { authJwt } = require("../middlewares/authJwt");
+const sqlite3 = require('sqlite3').verbose();
+const db2 = '../data/freelancegt.db'; // Ruta a tu base de datos SQLite 
 
 
 // Obtener freelancer_proyectos
@@ -28,17 +30,98 @@ router.get("/", authJwt, async (req, res) => {
     }
 });
 
-// Buscar freelancer_proyectos
+// Obtener proyectos  publicados con personsas que aplicaron y skills
+router.get("/myprojectscl",async(req,res) => {
+    try {
+        let ut = new Utilery();
+        let {idclient} = req.query;
+        idclient =  ut.sanitizeText(idclient);
+        idclient = Number(idclient);
+        console.log(idclient);
+        let strQuery = `
+                    SELECT
+                p.id_cliente,
+                p.titulo,
+                fp.id_freelancer,
+                fp.fecha_aplicacion,
+                u.nombre,
+                u.fecha_registro,
+                u.email,
+                s1.nombre AS skill1,
+                s2.nombre AS skill2,
+                s3.nombre AS skill3,
+                s4.nombre AS skill4,
+                s5.nombre AS skill5
+            FROM proyectos p
+            JOIN freelancer_proyecto fp ON fp.id_proyecto = p.id_proyecto
+            JOIN usuarios u ON fp.id_freelancer = u.id_usuario
+            JOIN skills s1 ON p.skill1 = s1.id_skill
+            JOIN skills s2 ON p.skill2 = s2.id_skill
+            JOIN skills s3 ON p.skill3 = s3.id_skill
+            JOIN skills s4 ON p.skill4 = s4.id_skill
+            JOIN skills s5 ON p.skill5 = s5.id_skill
+            WHERE p.id_cliente = ${idclient}`
+        // res.json({idclient});
+        const rows = await db.raw(strQuery);
+        res.json({ status: "success", data: rows });
+
+        
+    } catch (error) {
+        console.log(error)
+        res.json(error)
+    }
+});
+// Obtener proyectos a los que el fl aplico
+router.get("/myprojectscl",async(req,res) => {
+    try {
+        let ut = new Utilery();
+        let {idclient} = req.query;
+        idclient =  ut.sanitizeText(idclient);
+        idclient = Number(idclient);
+        console.log(idclient);
+        let strQuery = `
+                    SELECT
+                p.id_cliente,
+                p.titulo,
+                fp.id_freelancer,
+                fp.fecha_aplicacion,
+                u.nombre,
+                u.fecha_registro,
+                u.email,
+                s1.nombre AS skill1,
+                s2.nombre AS skill2,
+                s3.nombre AS skill3,
+                s4.nombre AS skill4,
+                s5.nombre AS skill5
+            FROM proyectos p
+            JOIN freelancer_proyecto fp ON fp.id_proyecto = p.id_proyecto
+            JOIN usuarios u ON fp.id_freelancer = u.id_usuario
+            JOIN skills s1 ON p.skill1 = s1.id_skill
+            JOIN skills s2 ON p.skill2 = s2.id_skill
+            JOIN skills s3 ON p.skill3 = s3.id_skill
+            JOIN skills s4 ON p.skill4 = s4.id_skill
+            JOIN skills s5 ON p.skill5 = s5.id_skill
+            WHERE p.id_cliente = ${idclient}` // Asegúrate de que el rol del freelancer sea 2
+        // res.json({idclient});
+        const rows = await db.raw(strQuery);
+        res.json({ status: "success", data: rows });
+
+        
+    } catch (error) {
+        console.log(error)
+        res.json(error)
+    }
+});
+
 router.get("/search", async (req, res) => {
     try {
         let ut = new Utilery();
         let { id, id_proyecto, id_freelancer, estado } = req.query;
-
         id = ut.sanitizeText(id);
         id_proyecto = ut.sanitizeText(id_proyecto);
+        console.log(req.query);
         id_freelancer = ut.sanitizeText(id_freelancer);
         estado = ut.sanitizeText(estado);
-
         let query = db("freelancer_proyecto").select("*");
         if (id) query = query.where({ id_freelancer_proyecto: id });
         if (id_proyecto) query = query.where({ id_proyecto });

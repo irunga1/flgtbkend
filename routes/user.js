@@ -17,12 +17,12 @@ router.get("/", authJwt, async (req, res) => {
 // Buscar usuarios
 router.get("/search", async (req, res) => {
     try {
-        let { nombre, email, rol } = req.query;
+        let { nombre, email, id_rol } = req.query;
         const ut = new Utilery();
 
         if (nombre) nombre = ut.sanitizeText(nombre);
         if (email) email = ut.sanitizeEmail(email);
-        if (rol) rol = ut.sanitizeText(rol);
+        if (id_rol) rol = ut.sanitizeText(id_rol);
 
         let query = db("usuarios").select("*");
 
