@@ -74,8 +74,8 @@ router.get("/myprojectsfl",async(req,res) => {
     }
 });
 // Obtener proyectos a los que el fl aplico
-router.get("/myprojectscl", authJwt ,async (req, res) => {
-// router.get("/myprojectscl",async (req, res) => {
+// router.get("/myprojectscl", authJwt ,async (req, res) => {
+router.get("/myprojectscl",async (req, res) => {
     try {
         let ut = new Utilery();
         let { idclient } = req.query;
