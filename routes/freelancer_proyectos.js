@@ -31,7 +31,7 @@ router.get("/", authJwt, async (req, res) => {
 });
 
 // Obtener proyectos  publicados con personsas que aplicaron y skills
-router.get("/myprojectscl",async(req,res) => {
+router.get("/myprojectsfl",async(req,res) => {
     try {
         let ut = new Utilery();
         let {idclient} = req.query;
@@ -39,11 +39,13 @@ router.get("/myprojectscl",async(req,res) => {
         idclient = Number(idclient);
         console.log(idclient);
         let strQuery = `
-                    SELECT
+            SELECT
+                p.estado,
                 p.id_cliente,
                 p.titulo,
                 fp.id_freelancer,
                 fp.fecha_aplicacion,
+                fp.propuesta,
                 u.nombre,
                 u.fecha_registro,
                 u.email,
@@ -72,19 +74,26 @@ router.get("/myprojectscl",async(req,res) => {
     }
 });
 // Obtener proyectos a los que el fl aplico
-router.get("/myprojectscl",async(req,res) => {
+router.get("/myprojectscl", authJwt ,async (req, res) => {
+// router.get("/myprojectscl",async (req, res) => {
     try {
         let ut = new Utilery();
-        let {idclient} = req.query;
-        idclient =  ut.sanitizeText(idclient);
+        let { idclient } = req.query;
+        idclient = ut.sanitizeText(idclient);
         idclient = Number(idclient);
-        console.log(idclient);
+        // console.log("aaaa"+authJwt);
+
         let strQuery = `
-                    SELECT
+            SELECT
+                p.estado,
+                p.id_proyecto,
+                p.presupuesto,
+                p.descripcion,
                 p.id_cliente,
                 p.titulo,
                 fp.id_freelancer,
                 fp.fecha_aplicacion,
+                fp.propuesta,
                 u.nombre,
                 u.fecha_registro,
                 u.email,
@@ -94,20 +103,57 @@ router.get("/myprojectscl",async(req,res) => {
                 s4.nombre AS skill4,
                 s5.nombre AS skill5
             FROM proyectos p
-            JOIN freelancer_proyecto fp ON fp.id_proyecto = p.id_proyecto
-            JOIN usuarios u ON fp.id_freelancer = u.id_usuario
+            LEFT JOIN freelancer_proyecto fp ON fp.id_proyecto = p.id_proyecto
+            LEFT JOIN usuarios u ON fp.id_freelancer = u.id_usuario
             JOIN skills s1 ON p.skill1 = s1.id_skill
             JOIN skills s2 ON p.skill2 = s2.id_skill
             JOIN skills s3 ON p.skill3 = s3.id_skill
             JOIN skills s4 ON p.skill4 = s4.id_skill
             JOIN skills s5 ON p.skill5 = s5.id_skill
-            WHERE p.id_cliente = ${idclient}` // Asegúrate de que el rol del freelancer sea 2
-        // res.json({idclient});
+            WHERE p.id_cliente = ${idclient}
+            ORDER BY p.id_proyecto`
+
         const rows = await db.raw(strQuery);
-        res.json({ status: "success", data: rows });        
+        const proyectos = {};
+
+        for (const row of rows) {
+            const id = row.id_proyecto;
+
+            // Si el proyecto no existe aún, lo creo con sus datos base
+            if (!proyectos[id]) {
+                proyectos[id] = {
+                    id_proyecto: row.id_proyecto,
+                    estado: row.estado,
+                    presupuesto: row.presupuesto,
+                    propuesta:row.propuesta,
+                    descripcion: row.descripcion,
+                    id_cliente: row.id_cliente,
+                    titulo: row.titulo,
+                    skill1: row.skill1,
+                    skill2: row.skill2,
+                    skill3: row.skill3,
+                    skill4: row.skill4,
+                    skill5: row.skill5,
+                    freelancers: [] // array para meter los freelancers
+                };
+            }
+
+            // Agrego el freelancer a ese proyecto
+            proyectos[id].freelancers.push({
+                id_freelancer: row.id_freelancer,
+                fecha_aplicacion: row.fecha_aplicacion,
+                propuesta: row.propuesta,
+                nombre: row.nombre,
+                email: row.email,
+                fecha_registro: row.fecha_registro
+            });
+        }
+
+        res.json({ status: "success", data: proyectos });
+
     } catch (error) {
         console.log(error)
-        res.json(error)
+        res.status(500).json({ status: "error", error: error.message })
     }
 });
 

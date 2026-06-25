@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Modal Propuestas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f4f7;
+      color: #1f2937;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .container {
+      width: min(960px, 100%);
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+      padding: 2rem;
+    }
+
+    h1 {
+      margin: 0 0 1rem;
+      font-size: 1.75rem;
+      color: #111827;
+    }
+
+    .button-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.85rem 1.3rem;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .button-primary:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      z-index: 50;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      width: min(920px, 100%);
+      max-height: 85vh;
+      overflow: auto;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 24px 80px rgba(15, 23, 42, 0.18);
+      padding: 1.75rem;
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: #111827;
+    }
+
+    .close-button {
+      width: 2.5rem;
+      height: 2.5rem;
+      border: none;
+      background: #f3f4f6;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: #374151;
+      transition: background 0.2s ease;
+    }
+
+    .close-button:hover {
+      background: #e5e7eb;
+    }
+
+    .project-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      background: #f9fafb;
+    }
+
+    .project-card h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.2rem;
+      color: #111827;
+    }
+
+    .project-details {
+      display: grid;
+      gap: 0.85rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-bottom: 1rem;
+    }
+
+    .project-details span {
+      display: block;
+      color: #4b5563;
+      font-size: 0.96rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.3rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      color: white;
+      background: #10b981;
+      width: fit-content;
+    }
+
+    .badge.estado-waiting {
+      background: #f97316;
+    }
+
+    .badge.estado-finalist {
+      background: #3b82f6;
+    }
+
+    .badge.estado-rejected {
+      background: #ef4444;
+    }
+
+    .badge.estado-selected {
+      background: #10b981;
+    }
+
+    .freelancer-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .freelancer-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .freelancer-content {
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .freelancer-title {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .freelancer-meta {
+      color: #6b7280;
+      font-size: 0.92rem;
+    }
+
+    .freelancer-propuesta {
+      margin: 0.5rem 0 0;
+      font-size: 0.95rem;
+      color: #374151;
+      background: #ffffff;
+      border-left: 4px solid #3b82f6;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+    }
+
+    .status-block {
+      display: grid;
+      gap: 0.5rem;
+      justify-items: end;
+      align-content: center;
+    }
+
+    .help-text {
+      color: #6b7280;
+      line-height: 1.7;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Propuestas del cliente</h1>
+    <p class="help-text">Este modal muestra la información que entrega el endpoint <code>/freelancer_proyectos/myprojectscl?idclient=9</code>.</p>
+    <button class="button-primary" id="openModal">Ver propuestas</button>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">Propuestas recibidas</h2>
+        <button class="close-button" id="closeModal" aria-label="Cerrar modal">×</button>
+      </div>
+      <div id="modalContent">
+        <p>Cargando propuestas...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const openModalButton = document.getElementById('openModal');
+    const closeModalButton = document.getElementById('closeModal');
+    const modalContent = document.getElementById('modalContent');
+
+    async function loadPropuestas() {
+      modalContent.innerHTML = '<p>Cargando propuestas...</p>';
+      try {
+        const response = await fetch('http://localhost:3001/freelancer_proyectos/myprojectscl?idclient=9');
+        if (!response.ok) {
+          throw new Error('Error al consultar el endpoint: ' + response.statusText);
+        }
+
+        const result = await response.json();
+        const proyectosRaw = result?.data || result || [];
+        const proyectos = Array.isArray(proyectosRaw) ? proyectosRaw : Object.values(proyectosRaw);
+
+        if (!proyectos.length) {
+          modalContent.innerHTML = '<p>No se encontraron propuestas para este cliente.</p>';
+          return;
+        }
+
+        modalContent.innerHTML = proyectos.map(project => {
+          const freelancers = Array.isArray(project.freelancers) ? project.freelancers : [];
+          const badges = {
+            waiting: 'estado-waiting',
+            rejected: 'estado-rejected',
+            finalist: 'estado-finalist',
+            selected: 'estado-selected'
+          };
+          const estadoClase = badges[project.estado] || '';
+
+          return `
+            <section class="project-card">
+              <div class="project-details">
+                <div>
+                  <h3>${project.titulo || 'Sin título'}</h3>
+                  <span>${project.descripcion || 'Sin descripción disponible.'}</span>
+                </div>
+                <div class="status-block">
+                  <span class="badge ${estadoClase}">${project.estado || 'desconocido'}</span>
+                  <span>ID proyecto: ${project.id_proyecto || '---'}</span>
+                </div>
+              </div>
+              <div class="project-details">
+                <span>Cliente: ${project.id_cliente || '---'}</span>
+                <span>Presupuesto: ${project.presupuesto || 'No definido'}</span>
+              </div>
+              <h4 style="margin: 1rem 0 0.5rem; color: #111827;">Propuestas</h4>
+              <ul class="freelancer-list">
+                ${freelancers.length ? freelancers.map(freelancer => `
+                  <li class="freelancer-item">
+                    <div class="freelancer-content">
+                      <p class="freelancer-title">${freelancer.nombre || 'Freelancer anonimizado'}</p>
+                      <p class="freelancer-meta">Email: ${freelancer.email || 'Sin email'} · Aplicación: ${freelancer.fecha_aplicacion || 'Sin fecha'}</p>
+                      <p class="freelancer-propuesta">${freelancer.propuesta || 'No hay propuesta'}</p>
+                    </div>
+                    <div class="status-block">
+                      <span class="badge">Freelancer</span>
+                    </div>
+                  </li>
+                `).join('') : '<li class="freelancer-item"><p>No hay freelancers aplicados.</p></li>'}
+              </ul>
+            </section>
+          `;
+        }).join('');
+      } catch (error) {
+        modalContent.innerHTML = `<p style="color:#b91c1c">${error.message}</p>`;
+      }
+    }
+
+    function openModal() {
+      modalBackdrop.classList.add('show');
+      loadPropuestas();
+    }
+
+    function closeModal() {
+      modalBackdrop.classList.remove('show');
+    }
+
+    openModalButton.addEventListener('click', openModal);
+    closeModalButton.addEventListener('click', closeModal);
+    modalBackdrop.addEventListener('click', event => {
+      if (event.target === modalBackdrop) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && modalBackdrop.classList.contains('show')) {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>

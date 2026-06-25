@@ -169,12 +169,18 @@ router.get("/search", async (req, res) => {
 router.post("/", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
-        let { titulo, descripcion, presupuesto, id_cliente, estado } = req.body;
+        let { titulo, descripcion, presupuesto, id_cliente, estado,
+              skill1, skill2, skill3, skill4, skill5 } = req.body;
 
         titulo = ut.sanitizeText(titulo);
-        descripcion = ut.sanitizeText(descripcion);
+        descripcion = ut.sanitizeParagraph(descripcion);
         presupuesto = ut.sanitizeText(presupuesto);
         id_cliente = ut.sanitizeText(id_cliente);
+        skill1 = ut.sanitizeText(skill1);
+        skill2 = ut.sanitizeText(skill2);
+        skill3 = ut.sanitizeText(skill3);
+        skill4 = ut.sanitizeText(skill4);
+        skill5 = ut.sanitizeText(skill5);
         estado = ut.sanitizeText(estado) || "activo";
 
         let [id] = await db("proyectos").insert({
@@ -183,9 +189,26 @@ router.post("/", authJwt, async (req, res) => {
             presupuesto,
             id_cliente,
             estado,
+            skill1,
+            skill2,
+            skill3,
+            skill4,
+            skill5
         });
 
-        res.json({ id_proyecto: id, titulo, descripcion, presupuesto, id_cliente, estado });
+        res.json({
+            id_proyecto: id,
+            titulo,
+            descripcion,
+            presupuesto,
+            id_cliente,
+            estado,
+            skill1,
+            skill2,
+            skill3,
+            skill4,
+            skill5
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -196,14 +219,25 @@ router.put("/:id", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
         let { id } = req.params;
-        let { titulo, descripcion, presupuesto, estado, id_cliente } = req.body;
+        // let { titulo, descripcion, presupuesto, estado, id_cliente } = req.body;
+        let { titulo, descripcion, presupuesto, id_cliente, estado,
+              skill1, skill2, skill3, skill4, skill5 } = req.body;
+        
+        console.log(req.user);
 
         id = ut.sanitizeText(id);
         titulo = ut.sanitizeText(titulo);
-        descripcion = ut.sanitizeText(descripcion);
+        descripcion = ut.sanitizeParagraph(descripcion);
         presupuesto = ut.sanitizeText(presupuesto);
         estado = ut.sanitizeText(estado);
-        id_cliente = ut.sanitizeText(id_cliente);
+        estado = (estado =="activo"?"abierto":estado)
+        id_cliente = req.user.id_usuario;
+        // id_cliente = ut.sanitizeText(id_cliente);
+        skill1 = ut.sanitizeText(skill1);
+        skill2 = ut.sanitizeText(skill2);
+        skill3 = ut.sanitizeText(skill3);
+        skill4 = ut.sanitizeText(skill4);
+        skill5 = ut.sanitizeText(skill5);   
 
         let patch = {};
         if (titulo !== undefined) patch.titulo = titulo;
@@ -211,6 +245,11 @@ router.put("/:id", authJwt, async (req, res) => {
         if (presupuesto !== undefined) patch.presupuesto = presupuesto;
         if (estado !== undefined) patch.estado = estado;
         if (id_cliente !== undefined) patch.id_cliente = id_cliente;
+        if (skill1 !== undefined) patch.skill1 = skill1;
+        if (skill2 !== undefined) patch.skill2 = skill2;
+        if (skill3 !== undefined) patch.skill3 = skill3;
+        if (skill4 !== undefined) patch.skill4 = skill4;
+        if (skill5 !== undefined) patch.skill5 = skill5;
 
         await db("proyectos")
             .where({ id_proyecto: id })

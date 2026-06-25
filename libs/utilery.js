@@ -19,21 +19,22 @@ class Utilery {
             return false;
         }
     }
-    sanitizeParagraph = (text) => {
+    sanitizeParagraph = (text = "") => {
         try {
+            if (text === "") return "";
+            text = String(text).trim();
 
-        if (text === "") return "";
-        text = String(text).trim();
-        const notAllow = ["'", "\"", "`", "\\", "|", "{", "}", "[", "]", "<", ">", ";", "--"];
-        for (let it of notAllow) {
-            text = text.replaceAll(it, "");
-        }
-        // Opcional: normalizar espacios múltiples
-        text = text.replace(/\s+/g, " ");
-        // Opcional: limitar tamaño para evitar payloads enormes
-        if (text.length > 450) return false;
-        return text;
+            // Bloquear caracteres peligrosos para SQL injection
+            const notAllow = ["'", "\"", "`", "\\", "|", "{", "}", "[", "]", "<", ">", ";", "--"];
+            for (let it of notAllow) {
+                text = text.replaceAll(it, "");
+            }
+            // Normalizar espacios múltiples pero conservar saltos de línea y tabs
+            text = text.replace(/ {2,}/g, " "); // solo espacios dobles o más
+            // Limitar tamaño para evitar payloads enormes
+            if (text.length > 2000) return false;
 
+            return text;
         } catch (error) {
             console.log(error);
             return false;
