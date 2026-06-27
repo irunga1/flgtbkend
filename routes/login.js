@@ -67,6 +67,11 @@ router.post("/", async (req, res) => {
 
 router.post("/forgot", async (req, res) => {
     try {
+        console.log({
+            EMAIL_USER: process.env.EMAIL_USER,
+            EMAIL_PASS_EXISTS: !!process.env.EMAIL_PASS,
+            EMAIL_PASS_LENGTH: process.env.EMAIL_PASS?.length
+        });
         const ut = new Utilery();
         const cripter = new Cripter();
         let { email } = req.body;
@@ -83,11 +88,7 @@ router.post("/forgot", async (req, res) => {
             await db("usuarios")    
                 .where({ email })
                 .update({ password: encrypted });
-            console.log({
-            EMAIL_USER: process.env.EMAIL_USER,
-            EMAIL_PASS_EXISTS: !!process.env.EMAIL_PASS,
-            EMAIL_PASS_LENGTH: process.env.EMAIL_PASS?.length
-            });
+
             const mailOptions = {
                 from:"jiredpront@gmail.com",
                 to: email,
