@@ -5,6 +5,24 @@ const Cripter = require('../libs/cripter');
 const Utilery = require('../libs/utilery');
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = process.env.SECRET_KEY;
+const nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransport({
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    secure: false,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
+transporter.verify((err, success) => {
+    if (err) {
+        console.log(err);
+    } else {
+        console.log("SMTP OK");
+    }
+});
+// xsmtpsib-98cb00b33458d14d67ee8291313538eda3bd20240e0a66acb1ca8cd705d2ad7d-8XX86fhLO8UbIzMr
 
 router.post("/", async (req, res) => {
     try {
@@ -65,6 +83,21 @@ router.post("/forgot", async (req, res) => {
             await db("usuarios")    
                 .where({ email })
                 .update({ password: encrypted });
+            const mailOptions = {
+                from:"jiredpront@gmail.com",
+                to: email,
+                subject: "Reinicio de contraseña",
+                text: `Hola ${user.nombre},\n\nSe ha solicitado un reinicio de contraseña para tu cuenta. Tu nueva contraseña temporal es: ${nPassword}\n\nPor favor, inicia sesión y cambia tu contraseña lo antes posible.\n\nGracias,\nEl equipo de soporte.`
+            };
+    
+
+            transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log("Error:", error);
+            } else {
+                console.log("Correo enviado:", info.response);
+            }
+            });
             return res.json({
                 status: "ok",
                 desc: "recovery email sent"

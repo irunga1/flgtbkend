@@ -31,17 +31,23 @@ router.get("/", authJwt, async (req, res) => {
 });
 
 // Obtener proyectos  publicados con personsas que aplicaron y skills
-router.get("/myprojectsfl",async(req,res) => {
+// router.get("/myprojectsfl", authJwt ,async (req, res) => {
+router.get("/myprojectsfl",async (req, res) => {
     try {
         let ut = new Utilery();
-        let {idclient} = req.query;
-        idclient =  ut.sanitizeText(idclient);
-        idclient = Number(idclient);
-        console.log(idclient);
+        let { idfreelancer } = req.query;
+        idfreelancer = ut.sanitizeText(idfreelancer);
+        idfreelancer = Number(idfreelancer);
+        // console.log("aaaa"+authJwt);
+
         let strQuery = `
             SELECT
                 p.estado,
+                p.id_proyecto,
+                p.presupuesto,
+                p.descripcion,
                 p.id_cliente,
+                p.fecha_publicacion,
                 p.titulo,
                 fp.id_freelancer,
                 fp.fecha_aplicacion,
@@ -55,27 +61,58 @@ router.get("/myprojectsfl",async(req,res) => {
                 s4.nombre AS skill4,
                 s5.nombre AS skill5
             FROM proyectos p
-            JOIN freelancer_proyecto fp ON fp.id_proyecto = p.id_proyecto
-            JOIN usuarios u ON fp.id_freelancer = u.id_usuario
+            LEFT JOIN freelancer_proyecto fp ON fp.id_proyecto = p.id_proyecto
+            LEFT JOIN usuarios u ON fp.id_freelancer = u.id_usuario
             JOIN skills s1 ON p.skill1 = s1.id_skill
             JOIN skills s2 ON p.skill2 = s2.id_skill
             JOIN skills s3 ON p.skill3 = s3.id_skill
             JOIN skills s4 ON p.skill4 = s4.id_skill
             JOIN skills s5 ON p.skill5 = s5.id_skill
-            WHERE p.id_cliente = ${idclient}`;
-        
-        const rows = await db.raw(strQuery);
-        res.json({ status: "success", data: rows });
+            WHERE u.id_usuario = ${idfreelancer}  and u.id_rol =2
+            ORDER BY p.id_proyecto;`
 
-        
+        const rows = await db.raw(strQuery);
+        const proyectos = {};
+
+        for (const row of rows) {
+            const id = row.id_proyecto;
+
+            // Si el proyecto no existe aún, lo creo con sus datos base
+            if (!proyectos[id]) {
+                proyectos[id] = {
+                    id_proyecto: row.id_proyecto,
+                    estado: row.estado,
+                    presupuesto: row.presupuesto,
+                    propuesta:row.propuesta,
+                    descripcion: row.descripcion,
+                    id_cliente: row.id_cliente,
+                    fecha_publicacion:row.fecha_publicacion,
+                    fecha_aplicacion:row.fecha_aplicacion,
+                    titulo: row.titulo,
+                    skill1: row.skill1,
+                    skill2: row.skill2,
+                    skill3: row.skill3,
+                    skill4: row.skill4,
+                    skill5: row.skill5,
+                     // array para meter los freelancers
+                };
+            }
+            // Agrego el freelancer a ese proyecto
+
+        }
+
+        res.json({ status: "success", data: proyectos });
+
     } catch (error) {
         console.log(error)
-        res.json(error)
+        res.status(500).json({ status: "error", error: error.message })
     }
 });
+
+
 // Obtener proyectos a los que el fl aplico
-// router.get("/myprojectscl", authJwt ,async (req, res) => {
-router.get("/myprojectscl",async (req, res) => {
+router.get("/myprojectscl", authJwt ,async (req, res) => {
+// router.get("/myprojectscl",async (req, res) => {
     try {
         let ut = new Utilery();
         let { idclient } = req.query;
