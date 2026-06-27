@@ -22,7 +22,7 @@ transporter.verify((err, success) => {
         console.log("SMTP OK");
     }
 });
-// xsmtpsib-98cb00b33458d14d67ee8291313538eda3bd20240e0a66acb1ca8cd705d2ad7d-8XX86fhLO8UbIzMr
+
 
 router.post("/", async (req, res) => {
     try {
