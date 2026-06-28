@@ -77,7 +77,8 @@ router.get("/", authJwt, async (req, res) => {
     }
 });
 
-router.get("/latest20", async (req, res) => {
+router.get("/latest20", authJwt, async (req, res) => {
+// router.get("/latest20", async (req, res) => {
     try {
         const limit = 20;
         const proyectos = await db("proyectos")
@@ -117,7 +118,8 @@ router.get("/latest20", async (req, res) => {
 
 // Buscar proyectos
 // router.get("/search", authJwt, async (req, res) => {
-router.get("/search", async (req, res) => {
+router.get("/search", authJwt, async (req, res) => {
+// router.get("/search", async (req, res) => {
     try {
         let ut = new Utilery();
         let { id, titulo, id_cliente, estado } = req.query;

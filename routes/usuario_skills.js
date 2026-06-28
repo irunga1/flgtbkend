@@ -6,7 +6,8 @@ const db = require("../db"); // importa tu conexión knex
 
 // Obtener usuario_skills
 // router.get("/",authJwt, async (req, res) => {
-router.get("/", async (req, res) => {
+router.get("/", authJwt, async (req, res) => {
+// router.get("/", async (req, res) => {
     try {
         let ut = new Utilery();
         let { id, id_usuario, id_skill } = req.query;
@@ -29,7 +30,8 @@ router.get("/", async (req, res) => {
 
 // Buscar usuario_skills
 // router.get("/search",authJwt,async (req, res) => {
-router.get("/search", async (req, res) => {
+router.get("/search", authJwt, async (req, res) => {
+// router.get("/search", async (req, res) => {
     try {
         let ut = new Utilery();
         let { id, id_usuario, id_skill } = req.query;
@@ -58,7 +60,8 @@ router.get("/search", async (req, res) => {
 
 // Agregar skill a usuario
 // router.post("/",authJwt,async (req, res) => {
-router.post("/", async (req, res) => {
+router.post("/", authJwt, async (req, res) => {
+// router.post("/", async (req, res) => {
     try {
         let ut = new Utilery();
         let { id_usuario, id_skill } = req.body;
@@ -78,7 +81,8 @@ router.post("/", async (req, res) => {
 // router.put("/:id", ,async (req, res) => {
 // router.put("/:id",authJwt,async (req, res) => {
 // Actualizar usuario_skill (sin columna `nivel`)
-router.put("/:id", async (req, res) => {
+router.put("/:id", authJwt, async (req, res) => {
+// router.put("/:id", async (req, res) => {
     try {
         let ut = new Utilery();
         let { id } = req.params;
@@ -94,7 +98,8 @@ router.put("/:id", async (req, res) => {
 
 
 // Eliminar skill de usuario
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authJwt, async (req, res) => {
+// router.delete("/:id", async (req, res) => {
     try {
         let ut = new Utilery();
         let { id } = req.params;

@@ -6,7 +6,8 @@ const {
 } = require("../middlewares/authJwt");
 
 // router.get("/", authJwt, async (req, res) => {
-router.get("/", async (req, res) => {
+router.get("/", authJwt, async (req, res) => {
+// router.get("/", async (req, res) => {
     try {
         const ut = new Utilery("");
         let {
@@ -41,7 +42,8 @@ router.get("/", async (req, res) => {
         });
     }
 });
-router.post("/apply", async (req, res) => {
+router.post("/apply", authJwt, async (req, res) => {
+// router.post("/apply", async (req, res) => {
     try {
         const ut = new Utilery("");
         let {

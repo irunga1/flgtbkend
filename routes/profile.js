@@ -4,7 +4,8 @@ const { authJwt } = require("../middlewares/authJwt");
 const db = require("../db");
 
 // router.get("/",authJwt ,async (req, res) => {
-router.get("/", async (req, res) => {
+router.get("/", authJwt, async (req, res) => {
+// router.get("/", async (req, res) => {
   try {
     const ut = new Utilery("");
     let { id_usuario } = req.query;
@@ -46,7 +47,8 @@ router.get("/", async (req, res) => {
 
 
 // router.put("/", authJwt, async (req, res) => {
-router.put("/", async (req, res) => {
+router.put("/", authJwt, async (req, res) => {
+// router.put("/", async (req, res) => {
     try {
         const ut = new Utilery("");
         const { id_usuario, email, nombre, password, skillsToDelete, skillsToAdd,descripcion } = req.body;

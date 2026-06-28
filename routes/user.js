@@ -15,7 +15,8 @@ router.get("/", authJwt, async (req, res) => {
 });
 
 // Buscar usuarios
-router.get("/search", async (req, res) => {
+router.get("/search", authJwt, async (req, res) => {
+// router.get("/search", async (req, res) => {
     try {
         let { nombre, email, id_rol } = req.query;
         const ut = new Utilery();
@@ -47,7 +48,8 @@ router.get("/search", async (req, res) => {
 });
 
 // router("/latest20", authJwt, (req,res) => {
-router.get("/latest20",async(req,res) => {
+router.get("/latest20", authJwt, async(req,res) => {
+// router.get("/latest20",async(req,res) => {
     try {
         const users = await db("usuarios")
         .where("id_rol", 2)
@@ -63,7 +65,8 @@ router.get("/latest20",async(req,res) => {
 
 
 // Obtener usuario por ID
-router.get("/:id", async (req, res) => {
+router.get("/:id", authJwt, async (req, res) => {
+// router.get("/:id", async (req, res) => {
     try {
         const ut = new Utilery();
         let { id } = req.params;
@@ -78,7 +81,8 @@ router.get("/:id", async (req, res) => {
 });
 
 // Crear usuario
-router.post("/", async (req, res) => {
+router.post("/", authJwt, async (req, res) => {
+// router.post("/", async (req, res) => {
     try {
 
         console.log("Body recibido:", req.body);
@@ -114,7 +118,8 @@ router.post("/", async (req, res) => {
 });
 
 // Actualizar usuario
-router.put("/:id", async (req, res) => {
+router.put("/:id", authJwt, async (req, res) => {
+// router.put("/:id", async (req, res) => {
     try {
         const ut = new Utilery();
         const { id } = req.params;
@@ -146,7 +151,8 @@ router.put("/:id", async (req, res) => {
 });
 
 // Eliminar usuario
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authJwt, async (req, res) => {
+// router.delete("/:id", async (req, res) => {
     try {
         const { id } = req.params;
 

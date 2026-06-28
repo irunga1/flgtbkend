@@ -32,7 +32,8 @@ router.get("/", authJwt, async (req, res) => {
 
 // Obtener proyectos  publicados con personsas que aplicaron y skills
 // router.get("/myprojectsfl", authJwt ,async (req, res) => {
-router.get("/myprojectsfl",async (req, res) => {
+router.get("/myprojectsfl", authJwt, async (req, res) => {
+// router.get("/myprojectsfl",async (req, res) => {
     try {
         let ut = new Utilery();
         let { idfreelancer } = req.query;
@@ -111,8 +112,8 @@ router.get("/myprojectsfl",async (req, res) => {
 
 
 // Obtener proyectos a los que el fl aplico
-router.get("/myprojectscl", authJwt ,async (req, res) => {
-// router.get("/myprojectscl",async (req, res) => {
+router.get("/myprojectscl", authJwt, async (req, res) => {
+// router.get("/myprojectscl", async (req, res) => {
     try {
         let ut = new Utilery();
         let { idclient } = req.query;
@@ -194,7 +195,8 @@ router.get("/myprojectscl", authJwt ,async (req, res) => {
     }
 });
 
-router.get("/search", async (req, res) => {
+router.get("/search", authJwt, async (req, res) => {
+// router.get("/search", async (req, res) => {
     try {
         let ut = new Utilery();
         let { id, id_proyecto, id_freelancer, estado } = req.query;
@@ -218,7 +220,8 @@ router.get("/search", async (req, res) => {
 
 
 // Crear freelancer_proyecto
-router.post("/", async (req, res) => {
+router.post("/", authJwt, async (req, res) => {
+// router.post("/", async (req, res) => {
     try {
         let ut = new Utilery();
         let { id_proyecto, id_freelancer, propuesta, estado } = req.body;
@@ -242,7 +245,8 @@ router.post("/", async (req, res) => {
 });
 
 // Actualizar freelancer_proyecto
-router.put("/:id", async (req, res) => {
+router.put("/:id", authJwt, async (req, res) => {
+// router.put("/:id", async (req, res) => {
     try {
         let ut = new Utilery();
         let { id } = req.params;
@@ -271,7 +275,8 @@ router.put("/:id", async (req, res) => {
 });
 
 // Eliminar freelancer_proyecto
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authJwt, async (req, res) => {
+// router.delete("/:id", async (req, res) => {
     try {
         let ut = new Utilery();
         let { id } = req.params;
