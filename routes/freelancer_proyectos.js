@@ -117,9 +117,15 @@ router.put("/selected/:id", async (req, res) => {
         id = ut.sanitizeText(id);
         id = Number(id);
         // Actualizar estado a "selected"
-        await db("freelancer_proyecto")
+        if(id >0){
+            await db("freelancer_proyecto")
             .where({ id_freelancer_proyecto: id })
             .update({ estado: "selected" });
+        }
+        else{
+            res.json({status:"error",desc:"id invalido"});
+        }
+
 
         res.json({ id_freelancer_proyecto: id, estado: "selected" });
     } catch (error) {
