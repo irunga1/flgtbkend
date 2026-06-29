@@ -109,6 +109,24 @@ router.get("/myprojectsfl", authJwt, async (req, res) => {
         res.status(500).json({ status: "error", error: error.message })
     }
 });
+router.put("/selected/:id", async (req, res) => {
+// router.put("/selected/:id", authJwt, async (req, res) => {
+    try {
+        let ut = new Utilery();
+        let { id } = req.params;
+        id = ut.sanitizeText(id);
+        id = Number(id);
+        // Actualizar estado a "selected"
+        await db("freelancer_proyecto")
+            .where({ id_freelancer_proyecto: id })
+            .update({ estado: "selected" });
+
+        res.json({ id_freelancer_proyecto: id, estado: "selected" });
+    } catch (error) {
+        res.status(500).json({ status: "error", error: error.message });
+    }
+});
+
 
 
 // Obtener proyectos a los que el fl aplico

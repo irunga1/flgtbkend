@@ -13,6 +13,7 @@ const usuario_skills = require("./routes/usuario_skills");
 const perfil = require("./routes/profile");
 const aplicar = require("./routes/aplicar");
 const login = require("./routes/login");
+const messages = require("./routes/messages");
 
 // server routes
 const app = express();
@@ -44,7 +45,8 @@ app.use("/freelancer_proyectos", freelancer_proyectos);
 app.use("/usuario_skills", usuario_skills);
 app.use("/login", login);
 app.use("/perfil", perfil);
-app.use("/aplicar",aplicar)
+app.use("/aplicar",aplicar);
+app.use("/messages",messages);
 
 app.listen(3001, () => {
     console.log('Server is running on port 3001');

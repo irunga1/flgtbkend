@@ -173,44 +173,50 @@ router.post("/", authJwt, async (req, res) => {
         let ut = new Utilery();
         let { titulo, descripcion, presupuesto, id_cliente, estado,
               skill1, skill2, skill3, skill4, skill5 } = req.body;
+        let idRol = req.user.id_rol;
+        if(idRol == 3) {
+            titulo = ut.sanitizeText(titulo);
+            descripcion = ut.sanitizeParagraph(descripcion);
+            presupuesto = ut.sanitizeText(presupuesto);
+            id_cliente = ut.sanitizeText(id_cliente);
+            skill1 = ut.sanitizeText(skill1);
+            skill2 = ut.sanitizeText(skill2);
+            skill3 = ut.sanitizeText(skill3);
+            skill4 = ut.sanitizeText(skill4);
+            skill5 = ut.sanitizeText(skill5);
+            estado = ut.sanitizeText(estado) || "activo";
 
-        titulo = ut.sanitizeText(titulo);
-        descripcion = ut.sanitizeParagraph(descripcion);
-        presupuesto = ut.sanitizeText(presupuesto);
-        id_cliente = ut.sanitizeText(id_cliente);
-        skill1 = ut.sanitizeText(skill1);
-        skill2 = ut.sanitizeText(skill2);
-        skill3 = ut.sanitizeText(skill3);
-        skill4 = ut.sanitizeText(skill4);
-        skill5 = ut.sanitizeText(skill5);
-        estado = ut.sanitizeText(estado) || "activo";
+            let [id] = await db("proyectos").insert({
+                titulo,
+                descripcion,
+                presupuesto,
+                id_cliente,
+                estado,
+                skill1,
+                skill2,
+                skill3,
+                skill4,
+                skill5
+            });
 
-        let [id] = await db("proyectos").insert({
-            titulo,
-            descripcion,
-            presupuesto,
-            id_cliente,
-            estado,
-            skill1,
-            skill2,
-            skill3,
-            skill4,
-            skill5
-        });
+            res.json({
+                id_proyecto: id,
+                titulo,
+                descripcion,
+                presupuesto,
+                id_cliente,
+                estado,
+                skill1,
+                skill2,
+                skill3,
+                skill4,
+                skill5
+            });
+        }
+        else{
+            res.json({status:"error",desc:"Rol Invalido"});
+        }
 
-        res.json({
-            id_proyecto: id,
-            titulo,
-            descripcion,
-            presupuesto,
-            id_cliente,
-            estado,
-            skill1,
-            skill2,
-            skill3,
-            skill4,
-            skill5
-        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
