@@ -81,8 +81,8 @@ router.get("/:id", authJwt, async (req, res) => {
 });
 
 // Crear usuario
-router.post("/", authJwt, async (req, res) => {
-// router.post("/", async (req, res) => {
+//router.post("/", authJwt, async (req, res) => {
+ router.post("/", async (req, res) => {
     try {
 
         console.log("Body recibido:", req.body);
