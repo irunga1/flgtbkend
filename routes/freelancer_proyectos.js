@@ -77,8 +77,8 @@ router.get("/myprojectsfl",async (req, res) => {
         res.status(500).json({ status: "error", error: error.message })
     }
 });
-// router.get("/selected/:id", async (req, res) => {
-router.put("/selected/:id", authJwt, async (req, res) => {
+router.get("/selected/:id", async (req, res) => {
+// router.put("/selected/:id", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
         let { id } = req.params;
