@@ -1,110 +1,189 @@
-# freelancegt (backend)
+# FreelanceGT Backend
 
-Backend en **Node.js + Express** para un sistema de **freelancers y proyectos**.
+Backend en Node.js + Express para una plataforma de freelancers y proyectos en Guatemala. La API gestiona usuarios, roles, skills, proyectos, postulaciones, perfiles y mensajes, usando SQLite como base de datos y JWT para autenticación.
 
-- Servidor: **`server.js`**
-- Persistencia: **SQLite** (archivo `data/freelancegt.db`) vía **Knex** (`db.js`)
-- Auth: **JWT** (middleware `middlewares/authJwt.js`)
+## Stack
 
----
+- Node.js
+- Express
+- Knex
+- SQLite3
+- JSON Web Token (jsonwebtoken)
+- Nodemailer
+- CORS
+- dotenv
+
+## Estructura del proyecto
+
+- [server.js](server.js): punto de entrada y montaje de rutas.
+- [db.js](db.js): configuración de Knex para SQLite.
+- [routes/](routes): endpoints organizados por dominio.
+- [middlewares/](middlewares): autenticación y validaciones.
+- [libs/](libs): utilidades y helpers para sanitización, encriptación y validación.
+- [data/](data): datos y recursos del proyecto.
+- [docs/](docs): documentación funcional adicional.
 
 ## Requisitos
-- Tener una base SQLite en `./data/freelancegt.db`
-- Archivo `.env` con al menos:
-  - `SECRET_KEY=...`
 
----
+- Node.js 18 o superior
+- npm
+- Archivo .env con al menos:
 
-## Levantar el servidor
+```env
+SECRET_KEY=tu_clave_secreta
+EMAIL_USER=tu_correo
+EMAIL_PASS=tu_password
+```
+
+## Instalación
+
 ```bash
 npm install
+```
+
+## Ejecución
+
+### Desarrollo
+
+```bash
 npm run dev
 ```
-El servidor corre en **puerto 3001**.
 
----
+### Producción
 
-## Auth (JWT)
-Algunos endpoints usan `authJwt`.
-
-### Header
-`Authorization: Bearer <token>`
-
-### Qué hace `authJwt`
-- Lee `authorization` del header.
-- Verifica el `token` con `process.env.SECRET_KEY`.
-- Si es válido: asigna `req.user = decoded`.
-
-> El payload (`decoded`) típicamente incluye: `id_usuario` y `id_rol`.
-
-### Login
-- **POST** `/login`
-
-Body:
-```json
-{ "email": "string", "password": "string" }
+```bash
+npm start
 ```
 
----
+El servidor corre por defecto en el puerto 3001.
 
-## Estructura / Routers montados
-En `server.js` se montan estas bases:
+## Base de datos
 
-- `/users` → `routes/user.js`
-- `/roles` → `routes/roles.js`
-- `/skills` → `routes/skills.js`
-- `/proyectos` → `routes/proyectos.js`
-- `/freelancer_proyectos` → `routes/freelancer_proyectos.js`
-- `/usuario_skills` → `routes/usuario_skills.js`
-- `/login` → `routes/login.js`
-- `/perfil` → `routes/profile.js`
-- `/aplicar` → `routes/aplicar.js`
-- `/messages` → `routes/messages.js`
+La aplicación usa SQLite con la base de datos ubicada en:
 
----
+- [data/freelancegt.db](data/freelancegt.db)
 
-## Flujo de datos (cómo funciona)
-La documentación funcional con el ciclo completo de datos está en:
+La conexión está definida en [db.js](db.js).
 
-- **`docs/README-FUNCIONAL.md`**
+## Autenticación
 
-Resumen del flujo general (request → DB → response):
-1. Cliente envía request (query params / params / body)
-2. (si aplica) `authJwt` valida el JWT y define `req.user`
-3. Router toma entradas y sanitiza con `libs/utilery.js`
-4. Router consulta SQLite usando **Knex** o **SQL crudo** (`db.raw`)
-5. Si aplica, el router transforma/agrupa resultados (por ejemplo agrupar freelancers por proyecto)
-6. Responde con `res.json(...)`
+La autenticación se realiza con JWT mediante el middleware [middlewares/authJwt.js](middlewares/authJwt.js).
 
----
+### Header esperado
 
-## Endpoints principales (vista rápida)
+```http
+Authorization: Bearer <token>
+```
 
-### Proyectos (cliente)
-Base: `/proyectos`
-- CRUD de `proyectos`
-- Listado y búsqueda con joins a:
-  - `usuarios` (cliente)
-  - `skills` (skill1..skill5)
+### Login
 
-### Aplicar a proyectos (freelancer)
-Base: `/aplicar`
-- **POST** `/aplicar/apply`: inserta una aplicación en `freelancer_proyecto` con `estado = "waiting"`
+Ruta:
 
-### Progreso/estado y propuesta (freelancer ↔ proyecto)
-Base: `/freelancer_proyectos`
-- Listados filtrados (con o sin authJwt según ruta)
-- Actualizar estado (ej. `selected`)
-- CRUD de `freelancer_proyecto`
+- POST /login
+
+Body esperado:
+
+```json
+{
+  "email": "usuario@email.com",
+  "password": "123456"
+}
+```
+
+Respuesta esperada:
+
+```json
+{
+  "status": "ok",
+  "token": "...",
+  "user": {
+    "id": 1,
+    "nombre": "Juan",
+    "email": "usuario@email.com",
+    "id_rol": 2
+  }
+}
+```
+
+## Endpoints principales
+
+### Usuarios
+
+- GET /users
+- GET /users/search
+- GET /users/latest20
+- GET /users/:id
+- POST /users
+- PUT /users/:id
+- DELETE /users/:id
+
+### Roles
+
+- GET /roles
+- GET /roles/search
+- GET /roles/:id
+- POST /roles
+- PUT /roles/:id
+- DELETE /roles/:id
+
+### Skills
+
+- GET /skills
+- GET /skills/search
+- POST /skills
+- PUT /skills/:id
+- DELETE /skills/:id
+
+### Proyectos
+
+- GET /proyectos
+- GET /proyectos/latest20
+- GET /proyectos/search
+- POST /proyectos
+- PUT /proyectos/:id
+- DELETE /proyectos/:id
+
+### Aplicaciones a proyectos
+
+- GET /aplicar
+- POST /aplicar/apply
+
+### Freelancers por proyecto
+
+- GET /freelancer_proyectos
+- GET /freelancer_proyectos/myprojectsfl
+- GET /freelancer_proyectos/selected/:id
+- POST /freelancer_proyectos
+- PUT /freelancer_proyectos/:id
+- DELETE /freelancer_proyectos/:id
+
+### Perfil
+
+- GET /perfil
+- PUT /perfil
 
 ### Mensajes
-Base: `/messages`
-- `GET /messages/getmessages?id_cliente=<id>`
-  - Devuelve mensajes agrupados por freelancer (última fecha por par)
 
----
+- GET /messages
+- POST /messages
+
+## Flujo general de la API
+
+1. El cliente envía una petición HTTP.
+2. Si la ruta requiere autenticación, el middleware JWT valida el token.
+3. El router recibe los parámetros, los sanitiza y construye la consulta.
+4. Se accede a SQLite mediante Knex o SQL crudo.
+5. La respuesta llega como JSON al cliente.
 
 ## Notas importantes
-- **No todos los endpoints están protegidos con `authJwt`**. La documentación funcional en `docs/README-FUNCIONAL.md` detalla qué rutas usan JWT y qué no.
-- Algunos endpoints usan `db.raw` con strings: conviene mantener sanitización estricta y, a futuro, migrar a queries parametrizadas.
 
+- La API realiza sanitización de entradas antes de interactuar con la base de datos.
+- Algunas rutas utilizan queries SQL crudas; en futuras iteraciones conviene migrarlas a consultas parametrizadas para reforzar la seguridad.
+- Para una documentación funcional más detallada, revisar [docs/README-FUNCIONAL.md](docs/README-FUNCIONAL.md).
+
+## Sugerencias de mejora
+
+- Mejorar la validación de datos por endpoint.
+- Standardizar respuestas JSON con campos consistentes como status, desc y data.
+- Añadir pruebas automáticas.
+- Migrar a PostgreSQL o MySQL en producción.
