@@ -1,5 +1,6 @@
 const Utilery = require("../libs/utilery");
 const Cripter = require("../libs/cripter");
+const DataValidator = require("../libs/datavalidator");
 const router = require("express").Router();
 const db = require("../db");
 const { authJwt } = require("../middlewares/authJwt");
@@ -18,8 +19,20 @@ router.get("/", authJwt, async (req, res) => {
 router.get("/search", authJwt, async (req, res) => {
 // router.get("/search", async (req, res) => {
     try {
+       
         let { nombre, email, id_rol } = req.query;
         const ut = new Utilery();
+        const dv = new DataValidator();
+
+        if (nombre !== undefined && !dv.textValidator(String(nombre))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (email !== undefined && !dv.mailValidator(String(email))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (id_rol !== undefined && !dv.numValidator(String(id_rol))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
 
         if (nombre) nombre = ut.sanitizeText(nombre);
         if (email) email = ut.sanitizeEmail(email);
@@ -69,7 +82,13 @@ router.get("/:id", authJwt, async (req, res) => {
 // router.get("/:id", async (req, res) => {
     try {
         const ut = new Utilery();
+        const dv = new DataValidator();
         let { id } = req.params;
+
+        if (id !== undefined && !dv.numValidator(String(id))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+
         id = ut.sanitizeText(id);
         const user = await db("usuarios")
             .where({ id_usuario: id })
@@ -87,7 +106,19 @@ router.get("/:id", authJwt, async (req, res) => {
 
         console.log("Body recibido:", req.body);
         const ut = new Utilery();
-        let { nombre, email, password, id_rol,descripcion } = req.body;         
+        const dv = new DataValidator();
+        let { nombre, email, password, id_rol,descripcion } = req.body;
+
+        if (nombre !== undefined && !dv.textValidator(String(nombre))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (email !== undefined && !dv.mailValidator(String(email))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (id_rol !== undefined && !dv.numValidator(String(id_rol))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        
         nombre = ut.sanitizeText(nombre);
         email = ut.sanitizeEmail(email);
         password = ut.sanitizePassword(password);
@@ -122,8 +153,22 @@ router.put("/:id", authJwt, async (req, res) => {
 // router.put("/:id", async (req, res) => {
     try {
         const ut = new Utilery();
+        const dv = new DataValidator();
         const { id } = req.params;
         let { name, email, password, id_rol, descripcion } = req.body;
+
+        if (id !== undefined && !dv.numValidator(String(id))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (name !== undefined && !dv.textValidator(String(name))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (email !== undefined && !dv.mailValidator(String(email))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (id_rol !== undefined && !dv.numValidator(String(id_rol))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
         console.log(req.body);
         console.log(email);
         name = ut.sanitizeText(name);

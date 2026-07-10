@@ -1,4 +1,5 @@
 const Utilery = require("../libs/utilery");
+const DataValidator = require("../libs/datavalidator");
 const router  = require('express').Router();
 const db = require("../db"); // importa tu conexión knex
 const { authJwt } = require("../middlewares/authJwt");
@@ -11,6 +12,28 @@ router.get("/", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
         let { id, id_proyecto, id_freelancer, estado } = req.query;
+        const dv = new DataValidator();
+
+        if (id !== undefined) {
+            const boolId = dv.numValidator(String(id));
+            if (!boolId) {
+                return res.json({ status: "error", desc: "invalid Data" });
+            }
+        }
+
+        if (id_proyecto !== undefined) {
+            const boolProyecto = dv.numValidator(String(id_proyecto));
+            if (!boolProyecto) {
+                return res.json({ status: "error", desc: "invalid Data" });
+            }
+        }
+
+        if (id_freelancer !== undefined) {
+            const boolFreelancer = dv.numValidator(String(id_freelancer));
+            if (!boolFreelancer) {
+                return res.json({ status: "error", desc: "invalid Data" });
+            }
+        }
 
         id = ut.sanitizeText(id);
         id_proyecto = ut.sanitizeText(id_proyecto);
