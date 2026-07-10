@@ -3,6 +3,7 @@ const router = require('express').Router();
 const db = require('../db');
 const Cripter = require('../libs/cripter');
 const Utilery = require('../libs/utilery');
+const DataValidator = require('../libs/datavalidator');
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = process.env.SECRET_KEY;
 const nodemailer = require('nodemailer');
@@ -28,7 +29,17 @@ router.post("/", async (req, res) => {
     try {
         const ut = new Utilery();
         const cripter = new Cripter();
+        // const dv = new DataValidator();
         let { email, password } = req.body;
+        let dv = new DataValidator();
+        let boolemail = dv.mailValidator(email);
+        console.log(email);
+        console.log(boolemail);
+
+        if ( dv.mailValidator(email) == false ) {
+            console.log("entro en el if");
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
         // Sanitizar correctamente
         email = ut.sanitizeEmail(email);
         password = ut.sanitizePassword(password);    

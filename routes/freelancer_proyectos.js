@@ -114,6 +114,7 @@ router.get("/myprojectsfl",async (req, res) => {
             .where({ id_freelancer_proyecto: id })
             .update({ estado: "selected" });
             console.log(row);
+            res.json({ status: "ok", desc: "selected",row:row });
         }
         else{
             res.json({status:"error",desc:"id invalido"});
@@ -150,6 +151,7 @@ router.get("/myprojectscl", async (req, res) => {
                 fp.id_freelancer_proyecto,
                 fp.fecha_aplicacion,
                 fp.propuesta,
+                fp.estado AS estado_aplicacion,
                 u.nombre,
                 u.fecha_registro,
                 u.email,
@@ -193,7 +195,6 @@ router.get("/myprojectscl", async (req, res) => {
                     freelancers: [] // array para meter los freelancers
                 };
             }
-
             // Agrego el freelancer a ese proyecto
             proyectos[id].freelancers.push({
                 id_freelancer: row.id_freelancer,
@@ -202,7 +203,8 @@ router.get("/myprojectscl", async (req, res) => {
                 nombre: row.nombre,
                 email: row.email,
                 fecha_registro: row.fecha_registro,
-                id_freelancer_proyecto: row.id_freelancer_proyecto
+                id_freelancer_proyecto: row.id_freelancer_proyecto,
+                estado_aplicacion: row.estado_aplicacion
 
             });
         }
