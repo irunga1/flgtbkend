@@ -12,33 +12,34 @@ const run = promisify(db.run.bind(db));
 // router.get('/',authJwt, async (req,res) => {
 router.get('/', async (req,res) => {
     try {
-        let {id_cliente,id_freelancer} = req.query;
+        let {id_user} = req.query;
         let ut = new Utilery();
-        id_cliente = ut.sanitizeText(id_cliente);
-        id_freelancer = ut.sanitizeText(id_freelancer);
-        id_cliente = Number(id_cliente);
-        id_freelancer = Number(id_freelancer);
-        let where = "";
-        if (id_cliente) {
-            where += ` m.id_cliente = ${id_cliente}`;
+        id_user = ut.sanitizeText(id_user);
+        id_user = Number(id_user);
+        if(id_user >=0){
+
         }
-        if (id_freelancer) {
-            where += `m.id_freelancer = ${id_freelancer}`;
-        }
-        let strQuery=`
-        SELECT
-            m.id_cliente,
-            m.id_freelancer,
-            u.nombre AS freelancer,
-            MAX(m.fecha) AS ultima_fecha,
-            m.mensaje 
-        FROM mensajes m
-        INNER JOIN usuarios u
-            ON u.id_usuario = m.id_freelancer
-        WHERE ${where}
-        GROUP BY m.id_cliente,m.id_freelancer
-        ORDER BY ultima_fecha DESC
+        let strQuery = `
+        select 	
+            m.id_mensaje, 
+            m.id_mensaje, 
+            m.id_emisor ,
+            m.id_proyecto,
+            m.mensaje,
+            m.mensaje,
+            m.horafecha,
+            m.tipo, 
+            u.nombre nombre_cliente,
+            u.email ,
+            u.descripcion
+        from 
+            mensajes m
+        join 
+            usuarios u  on u.id_usuario  = m.id_emisor
+        where m.id_receptor =${id_user} order by m.horafecha desc;
         `;
+        console.log(strQuery)
+
         let rows = await all(strQuery);
         res.json({status:"ok",data:rows}); 
     } catch (error) {
