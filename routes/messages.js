@@ -36,7 +36,7 @@ router.get('/', async (req,res) => {
             mensajes m
         join 
             usuarios u  on u.id_usuario  = m.id_emisor
-        where m.id_receptor =${id_user} order by m.horafecha desc;
+        where m.id_receptor =${id_user} or m.id_emisor= ${id_user} order by m.horafecha desc;
         `;
         console.log(strQuery)
 
