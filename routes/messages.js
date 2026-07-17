@@ -1,14 +1,15 @@
 const router = require('express').Router();
 const Utilery = require('../libs/utilery');
+const DataValidator = require("../libs/datavalidator");
 const sqlite = require('sqlite3').verbose();
 const { promisify } = require('util');
 const {authJwt} = require("../middlewares/authJwt");
 const db = new sqlite.Database('./data/freelancegt.db');
+const db2 = require("../db"); // importa tu conexión knex
+
 // SELECT varias filas
 const all = promisify(db.all.bind(db));
 const run = promisify(db.run.bind(db));
-
-
 // router.get('/',authJwt, async (req,res) => {
 router.get('/', async (req,res) => {
     try {
@@ -17,70 +18,92 @@ router.get('/', async (req,res) => {
         id_user = ut.sanitizeText(id_user);
         id_user = Number(id_user);
         if(id_user >=0){
-
+            // validación simple, no se cambia nada
         }
+
         let strQuery = `
-        select 	
+        select  
             m.id_mensaje, 
-            m.id_mensaje, 
-            m.id_emisor ,
+            m.id_emisor,
+            m.id_receptor,
             m.id_proyecto,
-            m.mensaje,
             m.mensaje,
             m.horafecha,
             m.tipo, 
-            u.nombre nombre_cliente,
-            u.email ,
-            u.descripcion
+            ue.nombre as nombre_emisor,
+            ue.email as email_emisor,
+            ue.descripcion as descripcion_emisor,
+            ur.nombre as nombre_receptor,
+            ur.email as email_receptor,
+            ur.descripcion as descripcion_receptor
         from 
             mensajes m
         join 
-            usuarios u  on u.id_usuario  = m.id_emisor
-        where m.id_receptor =${id_user} or m.id_emisor= ${id_user} 
-        and m.horafecha >= DATE('now','-2 months')
+            usuarios ue on ue.id_usuario = m.id_emisor
+        join 
+            usuarios ur on ur.id_usuario = m.id_receptor
+        where (m.id_receptor = ${id_user} or m.id_emisor = ${id_user})
+          and m.horafecha >= DATE('now','-2 months')
         order by m.horafecha desc;
         `;
-        console.log(strQuery)
+
+        console.log(strQuery);
 
         let rows = await all(strQuery);
         res.json({status:"ok",data:rows}); 
     } catch (error) {
         res.json({status:"error",error})
     }
-  
 });
+
 
 // router.post("/", authJwt, async (req, res) => {
 router.post("/", async (req, res) => {
     try {
-        const ut = new Utilery();
-        let { id_cliente, id_freelancer, emisor, tipo, mensaje } = req.body;
-        id_cliente = Number(ut.sanitizeText(id_cliente));
-        id_freelancer = Number(ut.sanitizeText(id_freelancer));
-        emisor = Number(ut.sanitizeText(emisor));
-        tipo = Number(ut.sanitizeText(tipo));
-        mensaje = ut.sanitizeParagraph(mensaje);
-        if (!Number.isInteger(id_cliente) || !Number.isInteger(id_freelancer)) {
-            return res.status(400).json({ status: 'error', desc: 'id_cliente y/o id_freelancer inválidos' });
+        let ut= new Utilery();
+        let dv = new DataValidator();
+        
+        let {id_emisor,id_receptor,tipo,id_proyecto,mensaje}= req.body;
+        let boolE  = dv.numValidator(id_emisor);  
+        let boolR  = dv.numValidator(id_receptor);  
+        let boolP  = dv.numValidator(id_proyecto);  
+        let boolM  = dv.textValidator(mensaje);
+        if(!boolE || !boolR || !boolP || !boolM){
+            res.json({status:"error",desc:"Datos incorrectos"});
+            return;
         }
-        if (!Number.isInteger(emisor) || !Number.isInteger(tipo)) {
-            return res.status(400).json({ status: 'error', desc: 'emisor y/o tipo inválidos' });
-        }
-        if (!mensaje) {
-            return res.status(400).json({ status: 'error', desc: 'mensaje inválido' });
-        }
-        // Evitar SQL injection: usar parámetros en lugar de concatenar strings
-        const strQuery = `
-            INSERT INTO mensajes (id_cliente, id_freelancer, emisor, tipo, mensaje, fecha)
-            VALUES (${id_cliente}, ${id_freelancer}, ${emisor}, ${tipo}, "${mensaje}", datetime('now'))
-        `;
-        // sqlite3: run(query, params, cb)
-        console.log(strQuery);
-        const rows = await run(strQuery);
-        res.json({ status: 'ok', data: rows });
+        id_emisor = ut.sanitizeText(id_emisor);
+        id_emisor = Number(id_emisor);
+        id_receptor = ut.sanitizeText(id_receptor);
+        id_receptor = Number(id_receptor);
+        tipo = ut.sanitizeText(tipo);
+        id_proyecto = ut.sanitizeText(id_proyecto);
+        id_proyecto = Number(id_proyecto);
+        mensaje = ut.sanitizeText(mensaje);
+        mensaje = String(mensaje).trim();
+         // Inserción
+        let [id] = await db2("mensajes").insert({
+            id_emisor,
+            id_receptor,
+            tipo,
+            id_proyecto,
+            mensaje
+        });
+
+        res.json({
+            status: "ok",
+            id_mensaje: id,
+            id_emisor,
+            id_receptor,
+            tipo,
+            id_proyecto,
+            mensaje
+        });
+
     } catch (error) {
-        res.json({ status: 'error', error });
-    }
+        res.json({status:"error",error})
+        console.log(error);
+    }        
 });
 
 module.exports =router;
