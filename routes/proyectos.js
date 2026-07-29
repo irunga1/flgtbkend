@@ -138,7 +138,15 @@ router.get("/search", authJwt, async (req, res) => {
 // router.get("/search", async (req, res) => {
     try {
         let ut = new Utilery();
+        const dv = new DataValidator();
         let { id, titulo, id_cliente, estado } = req.query;
+
+        if (id !== undefined && !dv.numValidator(String(id))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (id_cliente !== undefined && !dv.numValidator(String(id_cliente))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
 
         id = ut.sanitizeText(id);
         titulo = ut.sanitizeText(titulo);
@@ -187,9 +195,37 @@ router.get("/search", authJwt, async (req, res) => {
 router.post("/", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
+        const dv = new DataValidator();
         let { titulo, descripcion, presupuesto, id_cliente, estado,
               skill1, skill2, skill3, skill4, skill5 } = req.body;
         let idRol = req.user.id_rol;
+
+        // Validar con DataValidator
+        if (titulo !== undefined && !dv.textValidator(String(titulo))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (presupuesto !== undefined && !dv.amountValidator(String(presupuesto))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (id_cliente !== undefined && !dv.numValidator(String(id_cliente))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (skill1 !== undefined && !dv.numValidator(String(skill1))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (skill2 !== undefined && !dv.numValidator(String(skill2))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (skill3 !== undefined && !dv.numValidator(String(skill3))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (skill4 !== undefined && !dv.numValidator(String(skill4))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (skill5 !== undefined && !dv.numValidator(String(skill5))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+
         if(idRol == 3) {
             titulo = ut.sanitizeText(titulo);
             descripcion = ut.sanitizeParagraph(descripcion);
@@ -242,12 +278,39 @@ router.post("/", authJwt, async (req, res) => {
 router.put("/:id", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
+        const dv = new DataValidator();
         let { id } = req.params;
         // let { titulo, descripcion, presupuesto, estado, id_cliente } = req.body;
         let { titulo, descripcion, presupuesto, id_cliente, estado,
               skill1, skill2, skill3, skill4, skill5 } = req.body;
         
         console.log(req.user);
+
+        // Validar con DataValidator
+        if (id !== undefined && !dv.numValidator(String(id))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (titulo !== undefined && !dv.textValidator(String(titulo))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (presupuesto !== undefined && !dv.amountValidator(String(presupuesto))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (skill1 !== undefined && !dv.numValidator(String(skill1))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (skill2 !== undefined && !dv.numValidator(String(skill2))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (skill3 !== undefined && !dv.numValidator(String(skill3))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (skill4 !== undefined && !dv.numValidator(String(skill4))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (skill5 !== undefined && !dv.numValidator(String(skill5))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
 
         id = ut.sanitizeText(id);
         titulo = ut.sanitizeText(titulo);
@@ -289,7 +352,12 @@ router.put("/:id", authJwt, async (req, res) => {
 router.delete("/:id", authJwt, async (req, res) => {
     try {
         let ut = new Utilery();
+        const dv = new DataValidator();
         let { id } = req.params;
+
+        if (id !== undefined && !dv.numValidator(String(id))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
 
         id = ut.sanitizeText(id);
 

@@ -1,4 +1,5 @@
 const Utilery = require("../libs/utilery");
+const DataValidator = require("../libs/datavalidator");
 const router  = require('express').Router();
 const { authJwt } = require("../middlewares/authJwt");
 const db = require("../db"); // importa tu conexión knex
@@ -10,7 +11,18 @@ router.get("/", authJwt, async (req, res) => {
 // router.get("/", async (req, res) => {
     try {
         let ut = new Utilery();
+        const dv = new DataValidator();
         let { id, id_usuario, id_skill } = req.query;
+
+        if (id !== undefined && !dv.numValidator(String(id))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (id_usuario !== undefined && !dv.numValidator(String(id_usuario))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (id_skill !== undefined && !dv.numValidator(String(id_skill))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
 
         id = ut.sanitizeText(id);
         id_usuario = ut.sanitizeText(id_usuario);
@@ -34,7 +46,19 @@ router.get("/search", authJwt, async (req, res) => {
 // router.get("/search", async (req, res) => {
     try {
         let ut = new Utilery();
+        const dv = new DataValidator();
         let { id, id_usuario, id_skill } = req.query;
+
+        if (id !== undefined && !dv.numValidator(String(id))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (id_usuario !== undefined && !dv.numValidator(String(id_usuario))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (id_skill !== undefined && !dv.numValidator(String(id_skill))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+
         id = ut.sanitizeText(id);
         id = Number(id);
         id_usuario = ut.sanitizeText(id_usuario);
@@ -64,7 +88,15 @@ router.post("/", authJwt, async (req, res) => {
 // router.post("/", async (req, res) => {
     try {
         let ut = new Utilery();
+        const dv = new DataValidator();
         let { id_usuario, id_skill } = req.body;
+
+        if (id_usuario !== undefined && !dv.numValidator(String(id_usuario))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (id_skill !== undefined && !dv.numValidator(String(id_skill))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
 
         id_usuario = ut.sanitizeText(id_usuario);
         id_skill = ut.sanitizeText(id_skill);
@@ -85,7 +117,13 @@ router.put("/:id", authJwt, async (req, res) => {
 // router.put("/:id", async (req, res) => {
     try {
         let ut = new Utilery();
+        const dv = new DataValidator();
         let { id } = req.params;
+
+        if (id !== undefined && !dv.numValidator(String(id))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+
         id = ut.sanitizeText(id);
         id = Number(id);
         // Si en el futuro agregas otras columnas, aquí se actualizarían.
@@ -102,7 +140,12 @@ router.delete("/:id", authJwt, async (req, res) => {
 // router.delete("/:id", async (req, res) => {
     try {
         let ut = new Utilery();
+        const dv = new DataValidator();
         let { id } = req.params;
+
+        if (id !== undefined && !dv.numValidator(String(id))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
 
         id = ut.sanitizeText(id);
         id = Number(id);

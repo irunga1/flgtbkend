@@ -1,4 +1,5 @@
 const Utilery = require("../libs/utilery");
+const DataValidator = require("../libs/datavalidator");
 const router = require("express").Router();
 const { authJwt } = require("../middlewares/authJwt");
 const db = require("../db");
@@ -8,7 +9,12 @@ router.get("/", authJwt, async (req, res) => {
 // router.get("/", async (req, res) => {
   try {
     const ut = new Utilery("");
+    const dv = new DataValidator();
     let { id_usuario } = req.query;
+
+    if (id_usuario !== undefined && !dv.numValidator(String(id_usuario))) {
+      return res.json({ status: "error", desc: "invalid Data" });
+    }
 
     id_usuario = ut.sanitizeText(id_usuario);
     id_usuario = Number(id_usuario);
@@ -51,7 +57,21 @@ router.put("/", authJwt, async (req, res) => {
 // router.put("/", async (req, res) => {
     try {
         const ut = new Utilery("");
+        const dv = new DataValidator();
         const { id_usuario, email, nombre, password, skillsToDelete, skillsToAdd,descripcion } = req.body;
+
+        if (id_usuario !== undefined && !dv.numValidator(String(id_usuario))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (email !== undefined && !dv.mailValidator(String(email))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (nombre !== undefined && !dv.textValidator(String(nombre))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (descripcion !== undefined && !dv.textValidator(String(descripcion))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
 
         let id = ut.sanitizeText(id_usuario);
         id = Number(id);

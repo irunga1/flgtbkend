@@ -100,8 +100,8 @@ router.get("/myprojectsfl",async (req, res) => {
         res.status(500).json({ status: "error", error: error.message })
     }
 });
- router.get("/selected/:id", async (req, res) => {
-//router.put("/selected/:id", authJwt, async (req, res) => {
+// router.put("/selected/:id", authJwt, async (req, res) => {
+router.get("/selected/:id", async (req, res) => {
     try {
         let ut = new Utilery();
         let { id } = req.params;
@@ -113,19 +113,79 @@ router.get("/myprojectsfl",async (req, res) => {
             let row = await db("freelancer_proyecto")
             .where({ id_freelancer_proyecto: id })
             .update({ estado: "selected" });
+            let row2 = await db("freelancer_proyecto")
+            .where({ id_freelancer_proyecto: id })
+            .first();
+            let row3 = await db("proyectos")
+            .where({ id_proyecto: row2.id_proyecto })
+            .first();
+            let  mensaje = `¡Felicidades! Has sido seleccionado para el proyecto "${row3.titulo}". 
+            En un momento nos estaremos comunicando contigo para los siguientes pasos.`;
+            await db("mensajes").insert({
+                id_emisor: row3.id_cliente,   // el cliente que creó el proyecto
+                id_receptor: row2.id_freelancer,    // el freelancer seleccionado
+                id_proyecto: row2.id_proyecto,
+                mensaje: mensaje,
+                tipo: 1 // puedes usar 1=auto si quieres marcarlo como automático
+            });
+
+
             console.log(row);
-            res.json({ status: "ok", desc: "selected",row:row });
+            res.json({ status: "ok", desc: "selected",row:row2 });
         }
         else{
             res.json({status:"error",desc:"id invalido"});
         }
 
 
-        res.json({ id_freelancer_proyecto: id, estado: "selected" });
+        // res.json({ id_freelancer_proyecto: id, estado: "selected" });
     } catch (error) {
         res.status(500).json({ status: "error", error: error.message });
     }
 });
+
+// router.put("/selected/:id", authJwt, async (req, res) => {
+// router.put("/selected/:id", async (req, res) => {
+//     try {
+//         let ut = new Utilery();
+//         let { id } = req.params;
+//         id = ut.sanitizeText(id);
+//         id = Number(id);
+
+//         if (id > 0) {
+//             // Actualizar estado a "selected"
+//             await db("freelancer_proyecto")
+//                 .where({ id_freelancer_proyecto: id })
+//                 .update({ estado: "selected" });
+
+//             // Obtener datos del proyecto y freelancer
+//             let fp = await db("freelancer_proyecto")
+//                 .where({ id_freelancer_proyecto: id })
+//                 .first();
+
+//             let proyecto = await db("proyectos")
+//                 .where({ id_proyecto: fp.id_proyecto })
+//                 .first();
+
+//             // Insertar mensaje de felicitación
+//             let mensaje = `¡Felicidades! Has sido seleccionado para el proyecto "${proyecto.titulo}".`;
+
+//             await db("mensajes").insert({
+//                 id_emisor: proyecto.id_cliente,   // el cliente que creó el proyecto
+//                 id_receptor: fp.id_freelancer,    // el freelancer seleccionado
+//                 id_proyecto: fp.id_proyecto,
+//                 mensaje: mensaje,
+//                 tipo: 1 // puedes usar 1=auto si quieres marcarlo como automático
+//             });
+
+//             res.json({ status: "ok", desc: "selected", mensaje });
+//         } else {
+//             res.json({ status: "error", desc: "id invalido" });
+//         }
+//     } catch (error) {
+//         res.status(500).json({ status: "error", error: error.message });
+//     }
+// });
 
 
 

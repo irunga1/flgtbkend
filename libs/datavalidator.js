@@ -3,7 +3,7 @@ class DataValidator {
         this.firstProp = firstProp;
     }
     mailValidator = (mail) => {
-        const regex = /^[A-Za-z0-9.-_@]+$/
+        const regex = /^[A-Za-z0-9.-_]+@[A-Za-z0-9.-_]+$/
         let isTrue = regex.test(mail);
         return isTrue;
     }

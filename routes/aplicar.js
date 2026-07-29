@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const db = require("../db");
 const Utilery = require("../libs/utilery");
+const DataValidator = require("../libs/datavalidator");
 const {
     authJwt
 } = require("../middlewares/authJwt");
@@ -10,9 +11,15 @@ router.get("/", authJwt, async (req, res) => {
 // router.get("/", async (req, res) => {
     try {
         const ut = new Utilery("");
+        const dv = new DataValidator();
         let {
             id_usuario
         } = req.query;
+
+        if (id_usuario !== undefined && !dv.numValidator(String(id_usuario))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+
         id_usuario = ut.sanitizeText(id_usuario);
         id_usuario = Number(id_usuario);
 
@@ -46,11 +53,23 @@ router.post("/apply", authJwt, async (req, res) => {
 // router.post("/apply", async (req, res) => {
     try {
         const ut = new Utilery("");
+        const dv = new DataValidator();
         let {
             id_usuario,
             id_proyecto,
             propuesta
         } = req.body;
+
+        // Validar con DataValidator
+        if (id_usuario !== undefined && !dv.numValidator(String(id_usuario))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (id_proyecto !== undefined && !dv.numValidator(String(id_proyecto))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+        if (propuesta !== undefined && !dv.textValidator(String(propuesta))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
 
         // Sanitizar
         id_usuario = ut.sanitizeText(id_usuario);

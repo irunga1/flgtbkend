@@ -18,10 +18,16 @@ const run = promisify(db.run.bind(db));
 // router.get('/',authJwt, async (req,res) => {
 router.get("/test", async (req, res) => {
 	try {
+		const dv = new DataValidator();
 		let {
 			id_user
 		} = req.query;
 		let ut = new Utilery();
+
+		if (id_user !== undefined && !dv.numValidator(String(id_user))) {
+			return res.json({ status: "error", desc: "invalid Data" });
+		}
+
 		id_user = ut.sanitizeText(id_user);
 		id_user = Number(id_user);
 
@@ -86,8 +92,14 @@ router.get("/test", async (req, res) => {
 router.get("/", async (req, res) => {
 
     try {
+        const dv = new DataValidator();
         let ut  = new Utilery()
         let {id_user} = req.query;
+
+        if (id_user !== undefined && !dv.numValidator(String(id_user))) {
+            return res.json({ status: "error", desc: "invalid Data" });
+        }
+
         id_user = ut.sanitizeText(id_user);
         id_user = Number(id_user);
         if(id_user > 0){
